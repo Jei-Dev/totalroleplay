@@ -38,8 +38,8 @@ namespace totalRoleplay
             WindowSystem.AddWindow(QuestListWindow);
 
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
+            Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
             Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
-            this.CommandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
