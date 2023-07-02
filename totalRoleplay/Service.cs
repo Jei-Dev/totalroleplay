@@ -7,8 +7,6 @@ using Dalamud.Game.Gui;
 using Dalamud.Game.Gui.Toast;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Ipc;
-using System.Collections.Generic;
 
 namespace totalRoleplay
 {
@@ -17,6 +15,8 @@ namespace totalRoleplay
         public static Plugin plugin;
 
         public static Configuration pluginConfig;
+
+        public static QuestService questService;
 
         [PluginService]
         public static DalamudPluginInterface pluginInterface { get; private set; } = null!;

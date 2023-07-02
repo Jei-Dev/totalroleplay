@@ -1,9 +1,7 @@
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
-using Dalamud.IoC;
 using Dalamud.Plugin;
-using System;
 
 namespace totalRoleplay
 {
@@ -27,6 +25,7 @@ namespace totalRoleplay
             Service.plugin = this;
             Service.pluginConfig = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Service.pluginConfig.Initialize(pluginInterface);
+            Service.questService = new QuestService(pluginInterface);
 
             ConfigWindow = new ConfigWindow();
             TRPWindowMain = new TRPWindowMain();
