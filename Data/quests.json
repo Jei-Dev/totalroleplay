@@ -1,0 +1,21 @@
+{
+    "q1": {
+        "title": "foo",
+        "description": "foooooo",
+        "initialState": "start",
+        "states": {
+            "start": {
+                "triggers": [
+                    {
+                        "when": {
+                            "command": "fooo"
+                        },
+                        "then": {
+                            "finishQuest": true
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
