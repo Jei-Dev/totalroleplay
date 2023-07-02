@@ -3,14 +3,13 @@ using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using System;
 
 namespace totalRoleplay
 {
     public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Roleplay Totality";
-        private const string PluginCommand = "/trp";
-        private const string QuestCommand = "/trpq";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
@@ -36,7 +35,7 @@ namespace totalRoleplay
             WindowSystem.AddWindow(TRPWindowMain);
 
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
-            Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
+            Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -50,21 +49,24 @@ namespace totalRoleplay
             TRPWindowMain.Dispose();
 
             Service.commandManager.RemoveHandler("/trp");
-            Service.commandManager.RemoveHandler("/trpa");
+            Service.commandManager.RemoveHandler("/trpq");
         }
 
 
-        public void showQuestLine(string args)
+        public void showQuestLine(string[] args)
         {
+            var arg1 = args[0];
+            var arg2 = args[1];
+            var completeQuest = arg1 == "true";
             var canShow = Service.pluginConfig.showTextNotify;
             if (canShow)
             {
-                Service.toastGui?.ShowQuest($"{args}", new QuestToastOptions
+                Service.toastGui?.ShowQuest($"{arg2}", new QuestToastOptions
                 {
                     Position = QuestToastPosition.Centre,
-                    DisplayCheckmark = false,
+                    DisplayCheckmark = completeQuest,
                     IconId = 0,
-                    PlaySound = true
+                    PlaySound = completeQuest,
                 });
             }
         }
@@ -79,7 +81,8 @@ namespace totalRoleplay
                     TRPWindowMain.IsOpen = !TRPWindowMain.IsOpen;
                     break;
                 case "/trpq":
-                    showQuestLine(args);
+                    var sArgs = args.Split(' ', 2);
+                    showQuestLine(sArgs);
                     break;
             }
         }
@@ -91,7 +94,7 @@ namespace totalRoleplay
 
         public void DrawConfigUI()
         {
-            ConfigWindow.IsOpen = true;
+            ConfigWindow.IsOpen = !ConfigWindow.IsOpen;
         }
     }
 }
