@@ -196,6 +196,3 @@ FakesAssemblies/
 
 #Ignore APK
 *.apk
-
-#Ignore JSON
-*.json
