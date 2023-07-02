@@ -31,6 +31,7 @@ namespace totalRoleplay
             ConfigWindow = new ConfigWindow();
             TRPWindowMain = new TRPWindowMain();
             QuestListWindow = new QuestListWindow(this);
+            currencyWindow = new currencyWindow();
 
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(TRPWindowMain);
@@ -81,6 +82,9 @@ namespace totalRoleplay
                     break;
                 case "/trpqt":
                     Service.questService.TriggerCommand(args);
+                    break;
+                case "/trpcurrency":
+                    currencyWindow.IsOpen = !currencyWindow.IsOpen;
                     break;
             }
         }
