@@ -16,6 +16,7 @@ namespace totalRoleplay
         private ConfigWindow ConfigWindow { get; init; }
         private TRPWindowMain TRPWindowMain { get; init; }
         private QuestListWindow QuestListWindow { get; init; }
+        private currencyWindow currencyWindow { get; init; }
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
@@ -34,10 +35,12 @@ namespace totalRoleplay
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(TRPWindowMain);
             WindowSystem.AddWindow(QuestListWindow);
+            WindowSystem.AddWindow(currencyWindow);
 
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
-            Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
             Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
+            Service.commandManager.AddHandler("/trpqa", new CommandInfo(OnCommand));
+            Service.commandManager.AddHandler("/trpcurrency", new CommandInfo(OnCommand) { HelpMessage = "Shows Total Roleplay's Currency Window." });
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -51,30 +54,10 @@ namespace totalRoleplay
             TRPWindowMain.Dispose();
 
             Service.commandManager.RemoveHandler("/trp");
-            Service.commandManager.RemoveHandler("/trpa");
             Service.commandManager.RemoveHandler("/trpq");
+            Service.commandManager.RemoveHandler("/trpqa");
+            Service.commandManager.RemoveHandler("/trpcurrency");
         }
-
-
-        public void showQuestLine(string[] args)
-        {
-            var arg1 = args[0];
-            var arg2 = args[1];
-            var completeQuest = arg1 == "true";
-            var canShow = Service.pluginConfig.showTextNotify;
-            if (canShow)
-            {
-                Service.toastGui?.ShowQuest($"{arg2}", new QuestToastOptions
-                {
-                    Position = QuestToastPosition.Centre,
-                    DisplayCheckmark = completeQuest,
-                    IconId = 0,
-                    PlaySound = completeQuest,
-                });
-            }
-        }
-
-
         private void OnCommand(string command, string args)
         {
             // in response to the slash command, just display our main ui
@@ -86,9 +69,8 @@ namespace totalRoleplay
                 case "/trpq":
                     QuestListWindow.IsOpen = true;
                     break;
-                case "/trpa":
-                    var sArgs = args.Split(' ', 2);
-                    showQuestLine(sArgs);
+                case "/trpqa":
+                    QuestListWindow.IncrementCurrentQuestGoal();
                     break;
             }
         }
