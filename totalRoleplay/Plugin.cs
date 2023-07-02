@@ -18,6 +18,7 @@ namespace totalRoleplay
 
         private ConfigWindow ConfigWindow { get; init; }
         private TRPWindowMain TRPWindowMain { get; init; }
+        private QuestListWindow QuestListWindow { get; init; }
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
@@ -30,12 +31,15 @@ namespace totalRoleplay
 
             ConfigWindow = new ConfigWindow();
             TRPWindowMain = new TRPWindowMain();
+            QuestListWindow = new QuestListWindow(this);
 
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(TRPWindowMain);
+            WindowSystem.AddWindow(QuestListWindow);
 
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
-            Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
+            Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
+            this.CommandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -49,6 +53,7 @@ namespace totalRoleplay
             TRPWindowMain.Dispose();
 
             Service.commandManager.RemoveHandler("/trp");
+            Service.commandManager.RemoveHandler("/trpa");
             Service.commandManager.RemoveHandler("/trpq");
         }
 
@@ -81,6 +86,9 @@ namespace totalRoleplay
                     TRPWindowMain.IsOpen = !TRPWindowMain.IsOpen;
                     break;
                 case "/trpq":
+                    QuestListWindow.IsOpen = true;
+                    break;
+                case "/trpa":
                     var sArgs = args.Split(' ', 2);
                     showQuestLine(sArgs);
                     break;
