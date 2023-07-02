@@ -12,7 +12,6 @@ namespace totalRoleplay
         public string Name => "Roleplay Totality";
 
         private DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("totalRoleplay");
 
@@ -39,7 +38,7 @@ namespace totalRoleplay
 
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
             Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
-            this.CommandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
+            Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
 
             pluginInterface.UiBuilder.Draw += DrawUI;
             pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
