@@ -7,22 +7,27 @@ namespace totalRoleplay
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
-        public int Version { get; set; } = 0;
+        public bool showTextNotify { get; set; } = true;
 
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+        private static int VersionLatest = 0;
+        public int Version { get; set; } = VersionLatest;
+
+        public bool BooleanProperty { get; set; } = true;
 
         // the below exist just to make saving less cumbersome
         [NonSerialized]
-        private DalamudPluginInterface? PluginInterface;
+        private DalamudPluginInterface pluginInterface;
 
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
-            this.PluginInterface = pluginInterface;
+            this.pluginInterface = pluginInterface;
+
+            var needsResave = (Version != VersionLatest);
         }
 
         public void Save()
         {
-            this.PluginInterface!.SavePluginConfig(this);
+            pluginInterface.SavePluginConfig(this);
         }
     }
 }

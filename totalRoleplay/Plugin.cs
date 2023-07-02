@@ -1,16 +1,16 @@
 using Dalamud.Game.Command;
+using Dalamud.Game.Gui.Toast;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using System.IO;
-using Dalamud.Interface.Windowing;
-using totalRoleplay.Windows;
 
 namespace totalRoleplay
 {
     public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Roleplay Totality";
-        private const string CommandName = "/rt";
+        private const string PluginCommand = "/trp";
+        private const string QuestCommand = "/trpq";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
@@ -18,61 +18,76 @@ namespace totalRoleplay
         public WindowSystem WindowSystem = new("totalRoleplay");
 
         private ConfigWindow ConfigWindow { get; init; }
-        private MainWindow MainWindow { get; init; }
+        private TRPWindowMain TRPWindowMain { get; init; }
         private QuestListWindow QuestListWindow { get; init; }
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+        public Plugin(DalamudPluginInterface pluginInterface)
         {
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface);
+            pluginInterface.Create<Service>();
 
-            // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+            Service.plugin = this;
+            Service.pluginConfig = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Service.pluginConfig.Initialize(pluginInterface);
 
-            ConfigWindow = new ConfigWindow(this);
-            MainWindow = new MainWindow(this, goatImage);
+            ConfigWindow = new ConfigWindow();
+            TRPWindowMain = new TRPWindowMain();
             QuestListWindow = new QuestListWindow(this);
 
             WindowSystem.AddWindow(ConfigWindow);
-            WindowSystem.AddWindow(MainWindow);
+            WindowSystem.AddWindow(TRPWindowMain);
             WindowSystem.AddWindow(QuestListWindow);
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
-            {
-                HelpMessage = "A useful message to display in /xlhelp"
-            });
+            Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
+            Service.commandManager.AddHandler("/trpa", new CommandInfo(OnCommand) { HelpMessage = "Displays custom text in a Toast" });
             this.CommandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            pluginInterface.UiBuilder.Draw += DrawUI;
+            pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
         }
 
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            
+
             ConfigWindow.Dispose();
-            MainWindow.Dispose();
-            
-            this.CommandManager.RemoveHandler(CommandName);
-            this.CommandManager.RemoveHandler("/trpq");
+            TRPWindowMain.Dispose();
+
+            Service.commandManager.RemoveHandler("/trp");
+            Service.commandManager.RemoveHandler("/trpa");
+            Service.commandManager.RemoveHandler("/trpq");
         }
+
+
+        public void showQuestLine(string args)
+        {
+            var canShow = Service.pluginConfig.showTextNotify;
+            if (canShow)
+            {
+                Service.toastGui?.ShowQuest($"{args}", new QuestToastOptions
+                {
+                    Position = QuestToastPosition.Centre,
+                    DisplayCheckmark = false,
+                    IconId = 0,
+                    PlaySound = true
+                });
+            }
+        }
+
 
         private void OnCommand(string command, string args)
         {
             // in response to the slash command, just display our main ui
-            switch(command) {
-                case CommandName:
-                    MainWindow.IsOpen = true;
+            switch (command)
+            {
+                case "/trp":
+                    TRPWindowMain.IsOpen = !TRPWindowMain.IsOpen;
                     break;
                 case "/trpq":
                     QuestListWindow.IsOpen = true;
+                    break;
+                case "/trpa":
+                    showQuestLine(args);
                     break;
             }
         }
