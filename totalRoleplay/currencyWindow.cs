@@ -13,7 +13,7 @@ public class currencyWindow : Window, IDisposable
 	{
 		public required string currencyID { get; init; }
 		public required string currencyName { get; init; }
-		public required int currencyAmount { get; init; }
+		public required int currencyAmount { get; set; }
 	};
 
 	public currencyWindow() : base("TRP - Currency", 0)
@@ -23,7 +23,7 @@ public class currencyWindow : Window, IDisposable
 	}
 
 	private Currency[] currency = {
-			new Currency { currencyID = "0001", currencyName = "Gil", currencyAmount = 100 },
+			new Currency { currencyID = "GIL0001", currencyName = "Gil", currencyAmount = 100 },
 	};
 
 	public void Dispose() { }
