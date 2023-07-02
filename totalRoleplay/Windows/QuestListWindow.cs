@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
+using Dalamud.Logging;
 using ImGuiNET;
 
 namespace totalRoleplay;
@@ -30,13 +31,21 @@ public class QuestListWindow : Window, IDisposable
             new Quest { Name = "quest 2", Description = "my second quest!" },
             new Quest { Name = "quest 3", Description = "booooooo" }
         };
-        string[] questNames = new string[quests.Length];
-        for (int i = 0; i < quests.Length; ++i) {
-            questNames[i] = quests[i].Name;
+        ImGui.Text("Quests");
+        if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * quests.Length + ImGui.GetStyle().FramePadding.Y)))
+        {
+            for (int i = 0; i < quests.Length; ++i)
+            {
+                if (ImGui.Selectable(quests[i].Name, selectedQuest == i))
+                {
+                    selectedQuest = i;
+                }
+            }
+            ImGui.EndListBox();
         }
-        ImGui.ListBox("Quests", ref selectedQuest, questNames, quests.Length);
 
-        if (selectedQuest >= 0) {
+        if (selectedQuest >= 0)
+        {
             ImGui.Text(quests[selectedQuest].Description);
         }
     }
