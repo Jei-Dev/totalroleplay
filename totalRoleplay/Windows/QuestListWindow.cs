@@ -18,53 +18,51 @@ public record Quest
 
 public class QuestListWindow : Window, IDisposable
 {
-    private int selectedQuest = -1;
-    private Quest[] quests = {
-            new Quest { Name = "quest 1", Description = "my first quest!", goalFinal = 3},
-            new Quest { Name = "quest 2", Description = "my second quest!", goalFinal = 10},
-            new Quest { Name = "quest 3", Description = "booooooo", goalFinal = 2 }
-        };
+    private string? selectedQuest;
 
     public QuestListWindow(Plugin plugin) : base("TRP - Quests", 0)
     {
         this.Size = new Vector2(200, 200);
         this.SizeCondition = ImGuiCond.Once;
+        Service.questService.QuestComplete += QuestCompleted;
     }
 
-    public void Dispose() { }
+    public void Dispose()
+    {
+        Service.questService.QuestComplete -= QuestCompleted;
+    }
 
     public override void Draw()
     {
         ImGui.Text("Quests");
-        if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * quests.Length + ImGui.GetStyle().FramePadding.Y)))
+        if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * Service.questService.ActiveQuests.Count * 2 + ImGui.GetStyle().FramePadding.Y)))
         {
-            for (int i = 0; i < quests.Length; ++i)
+            foreach (var activeQuest in Service.questService.ActiveQuests)
             {
-                if (ImGui.Selectable(quests[i].Name, selectedQuest == i))
+                var quest = Service.questService.Quests[activeQuest.QuestId];
+                if (ImGui.Selectable(quest.Title, activeQuest.QuestId == selectedQuest))
                 {
-                    selectedQuest = i;
+                    selectedQuest = activeQuest.QuestId;
                 }
-                var quSelect = quests[i].questSelected;
-                var gCurr = quests[i].goalCurrent;
-                var gNext = quests[i].goalFinal;
+                var quSelect = activeQuest.IsTracked;
+                var gCurr = activeQuest.GoalCurrent;
+                var gNext = activeQuest.GoalFinal;
                 ImGui.Checkbox($"{gCurr}/{gNext}", ref quSelect);
-                if (quSelect && !quests[i].questSelected && (quests[i].goalCurrent == quests[i].goalFinal))
-                {
-                    showQuestToast(true);
-                }
-                quests[i].questSelected = quSelect;
+                activeQuest.IsTracked = quSelect;
             }
             ImGui.EndListBox();
         }
 
-        if (selectedQuest >= 0)
+        if (selectedQuest != null)
         {
-            ImGui.Text(quests[selectedQuest].Description);
+            ImGui.Text(Service.questService.Quests[selectedQuest].Description);
         }
     }
     public void IncrementCurrentQuestGoal()
     {
-        quests[selectedQuest].goalCurrent++;
+        Service.questService.ActiveQuests
+            .FindAll(aq => aq.QuestId == selectedQuest)
+            .ForEach(aq => aq.GoalCurrent++);
     }
     /// <summary>
     /// Shows Quest Toast
@@ -74,7 +72,7 @@ public class QuestListWindow : Window, IDisposable
         var canShow = Service.pluginConfig.showTextNotify;
         if (canShow)
         {
-            var questName = quests[selectedQuest].Name;
+            var questName = Service.questService.Quests[selectedQuest!].Title;
             Service.toastGui?.ShowQuest($"{questName}", new QuestToastOptions
             {
                 Position = QuestToastPosition.Centre,
@@ -83,5 +81,17 @@ public class QuestListWindow : Window, IDisposable
                 PlaySound = complete,
             });
         }
+    }
+
+    private void QuestCompleted(string questId)
+    {
+        var questName = Service.questService.Quests[questId].Title;
+        Service.toastGui?.ShowQuest($"{questName}", new QuestToastOptions
+        {
+            Position = QuestToastPosition.Centre,
+            DisplayCheckmark = true,
+            IconId = 0, // Maybe usesful for the user if we wish for them to have custom Icons for their quests.
+            PlaySound = true,
+        });
     }
 }

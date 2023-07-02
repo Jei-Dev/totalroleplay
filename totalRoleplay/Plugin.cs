@@ -40,6 +40,8 @@ namespace totalRoleplay
             Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
             Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
             Service.commandManager.AddHandler("/trpqa", new CommandInfo(OnCommand));
+            Service.commandManager.AddHandler("/trpqb", new CommandInfo(OnCommand));
+            Service.commandManager.AddHandler("/trpqt", new CommandInfo(OnCommand));
             Service.commandManager.AddHandler("/trpcurrency", new CommandInfo(OnCommand) { HelpMessage = "Shows Total Roleplay's Currency Window." });
 
             pluginInterface.UiBuilder.Draw += DrawUI;
@@ -56,6 +58,8 @@ namespace totalRoleplay
             Service.commandManager.RemoveHandler("/trp");
             Service.commandManager.RemoveHandler("/trpq");
             Service.commandManager.RemoveHandler("/trpqa");
+            Service.commandManager.RemoveHandler("/trpqb");
+            Service.commandManager.RemoveHandler("/trpqt");
             Service.commandManager.RemoveHandler("/trpcurrency");
         }
         private void OnCommand(string command, string args)
@@ -71,6 +75,12 @@ namespace totalRoleplay
                     break;
                 case "/trpqa":
                     QuestListWindow.IncrementCurrentQuestGoal();
+                    break;
+                case "/trpqb":
+                    Service.questService.BeginQuest(args);
+                    break;
+                case "/trpqt":
+                    Service.questService.TriggerCommand(args);
                     break;
             }
         }

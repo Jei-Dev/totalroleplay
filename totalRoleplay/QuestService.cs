@@ -33,28 +33,39 @@ class QuestService : IServiceType
         ActiveQuests.Add(new Model.ActiveQuest
         {
             QuestId = questId,
-            CurrentState = Quests[questId].InitialState
+            CurrentState = Quests[questId].InitialState,
+            IsTracked = false,
+            GoalCurrent = 0,
+            GoalFinal = 5
         });
     }
 
-    public void TriggerCommand(string cmd) {
-        foreach (var aq in ActiveQuests) {
+    public void TriggerCommand(string cmd)
+    {
+        foreach (var aq in ActiveQuests)
+        {
             var quest = Quests[aq.QuestId];
             var state = quest.States[aq.CurrentState];
-            foreach (var trigger in state.Triggers) {
-                if (trigger.When.Command == cmd) {
+            foreach (var trigger in state.Triggers)
+            {
+                if (trigger.When.Command == cmd)
+                {
                     ExecuteTriggerActions(aq.QuestId, trigger.Then);
                 }
             }
         }
     }
 
-    private void ExecuteTriggerActions(string questId, Model.QuestStateTriggerAction action) {
-        if (action.GoToState != null) {
+    private void ExecuteTriggerActions(string questId, Model.QuestStateTriggerAction action)
+    {
+        if (action.GoToState != null)
+        {
             ActiveQuests.FindAll(aq => aq.QuestId == questId).ForEach(aq => aq.CurrentState = action.GoToState);
         }
-        if (action.FinishQuest) {
-            if (QuestComplete != null) {
+        if (action.FinishQuest)
+        {
+            if (QuestComplete != null)
+            {
                 QuestComplete(questId);
             }
             ActiveQuests.RemoveAll(aq => aq.QuestId == questId);
