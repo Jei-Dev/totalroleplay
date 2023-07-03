@@ -4,30 +4,31 @@ using System;
 
 namespace totalRoleplay
 {
-    [Serializable]
-    public class Configuration : IPluginConfiguration
-    {
-        public bool showTextNotify { get; set; } = true;
+	[Serializable]
+	public class Configuration : IPluginConfiguration
+	{
+		public bool showTextNotify { get; set; } = true;
 
-        private static int VersionLatest = 0;
-        public int Version { get; set; } = VersionLatest;
+		private static int VersionLatest = 0;
+		public int Version { get; set; } = VersionLatest;
 
-        public bool BooleanProperty { get; set; } = true;
+		public bool BooleanProperty { get; set; } = true;
 
-        // the below exist just to make saving less cumbersome
-        [NonSerialized]
-        private DalamudPluginInterface pluginInterface;
+		// the below exist just to make saving less cumbersome
+		[NonSerialized]
+		private DalamudPluginInterface pluginInterface;
 
-        public void Initialize(DalamudPluginInterface pluginInterface)
-        {
-            this.pluginInterface = pluginInterface;
+		public void Initialize(DalamudPluginInterface pluginInterface)
+		{
+			this.pluginInterface = pluginInterface;
 
-            var needsResave = (Version != VersionLatest);
-        }
+			var needsResave = (Version != VersionLatest);
+			if (needsResave) { Save(); }
+		}
 
-        public void Save()
-        {
-            pluginInterface.SavePluginConfig(this);
-        }
-    }
+		public void Save()
+		{
+			pluginInterface.SavePluginConfig(this);
+		}
+	}
 }

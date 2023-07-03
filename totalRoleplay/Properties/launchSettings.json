@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "totalRoleplay": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

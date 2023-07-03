@@ -1,8 +1,7 @@
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
-using totalRoleplay.Managers;
+using totalRoleplay.Handlers;
+using totalRoleplay.Windows;
 
 namespace totalRoleplay
 {

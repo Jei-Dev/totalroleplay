@@ -4,7 +4,7 @@ using Dalamud.Logging;
 using Dalamud.Plugin;
 using System;
 
-namespace totalRoleplay.Managers;
+namespace totalRoleplay.Handlers;
 
 public static class TRPCommandManager
 {
@@ -16,10 +16,10 @@ public static class TRPCommandManager
 
 	private static readonly Commands[] ACommands = {
 		new Commands { CommandName = "trp", HelpMessage = "Opens the Total Roleplay menu."},
-		new Commands { CommandName = "trpq", HelpMessage = ""},
-		new Commands { CommandName = "trpqa", HelpMessage = ""},
-		new Commands { CommandName = "trpqb", HelpMessage = ""},
-		new Commands { CommandName = "trpqt", HelpMessage = ""},
+		new Commands { CommandName = "trpq", HelpMessage = null},
+		new Commands { CommandName = "trpqa", HelpMessage = null},
+		new Commands { CommandName = "trpqb", HelpMessage = null},
+		new Commands { CommandName = "trpqt", HelpMessage = null},
 		new Commands { CommandName = "trpcurrency", HelpMessage = "Opens the Currency Window"}
 	};
 
@@ -30,7 +30,7 @@ public static class TRPCommandManager
 	{
 		for (int i = 0; i < ACommands.Length; i++)
 		{
-			Service.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandHandler));
+			Service.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandHandler) { HelpMessage = ACommands[i].HelpMessage ?? "N/A" });
 			PluginLog.LogDebug("CommandManager: Loaded /" + ACommands[i].CommandName);
 		}
 	}

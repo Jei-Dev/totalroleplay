@@ -4,9 +4,9 @@
     <Authors></Authors>
     <Company></Company>
     <Version>0.0.0.2</Version>
-    <Description>A sample plugin.</Description>
+    <Description>Brings roleplay to life.</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Jei-Dev/totalroleplay</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>
