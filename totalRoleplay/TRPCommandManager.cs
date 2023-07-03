@@ -14,7 +14,7 @@ public static class TRPCommandManager
 		public string? HelpMessage { get; init; }
 	};
 
-	private static readonly Commands[] commands = {
+	private static readonly Commands[] ACommands = {
 		new Commands { CommandName = "trp", HelpMessage = "Opens the Total Roleplay menu."},
 		new Commands { CommandName = "trpq", HelpMessage = ""},
 		new Commands { CommandName = "trpqa", HelpMessage = ""},
@@ -28,10 +28,10 @@ public static class TRPCommandManager
 	/// </summary>
 	public static void Load()
 	{
-		for (int i = 0; i < commands.Length; i++)
+		for (int i = 0; i < ACommands.Length; i++)
 		{
-			Service.commandManager.AddHandler("/" + commands[i].CommandName, new CommandInfo(CommandHandler));
-			PluginLog.LogDebug("CommandManager: Loaded /" + commands[i].CommandName);
+			Service.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandHandler));
+			PluginLog.LogDebug("CommandManager: Loaded /" + ACommands[i].CommandName);
 		}
 	}
 
@@ -40,10 +40,10 @@ public static class TRPCommandManager
 	/// </summary>
 	public static void UnLoad()
 	{
-		for (int i = 0; i < commands.Length; i++)
+		for (int i = 0; i < ACommands.Length; i++)
 		{
-			Service.commandManager.RemoveHandler("/" + commands[i].CommandName);
-			PluginLog.LogDebug("CommandManager: Destroyed /" + commands[i].CommandName);
+			Service.commandManager.RemoveHandler("/" + ACommands[i].CommandName);
+			PluginLog.LogDebug("CommandManager: Destroyed /" + ACommands[i].CommandName);
 		}
 	}
 
