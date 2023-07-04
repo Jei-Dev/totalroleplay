@@ -1,21 +1,28 @@
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using System;
+using System.IO;
 using System.Numerics;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
-public class ConfigWindow : Window, IDisposable
+public class FakeDialogueWindow : Window, IDisposable
 {
-	public ConfigWindow() : base("Total Roleplay Configuration")
+	public FakeDialogueWindow() : base("Fake Dialogue Window")
 	{
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 		this.Size = new Vector2(232, 75);
 		this.SizeCondition = ImGuiCond.Always;
+
+		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "images/FFXIVEmptyDialogueBox.png");
+		var dialogueBox = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
 	}
 
-	public void Dispose() { }
+	public void Dispose()
+	{
+
+	}
 
 	public override void Draw()
 	{

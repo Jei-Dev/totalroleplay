@@ -3,10 +3,11 @@ using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using System;
+using totalRoleplay.Service;
 
 namespace totalRoleplay.Handlers;
 
-public static class TRPCommandManager
+public static class CommandHandler
 {
 	private record Commands
 	{
@@ -20,7 +21,8 @@ public static class TRPCommandManager
 		new Commands { CommandName = "trpqa", HelpMessage = null},
 		new Commands { CommandName = "trpqb", HelpMessage = null},
 		new Commands { CommandName = "trpqt", HelpMessage = null},
-		new Commands { CommandName = "trpcurrency", HelpMessage = "Opens the Currency Window"}
+		new Commands { CommandName = "trpcurrency", HelpMessage = "Opens the Currency Window"},
+		new Commands { CommandName = "trpfakeDialogue", HelpMessage = "Opens the Fake Dialogue Window"}
 	};
 
 	/// <summary>
@@ -30,7 +32,7 @@ public static class TRPCommandManager
 	{
 		for (int i = 0; i < ACommands.Length; i++)
 		{
-			Service.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandHandler) { HelpMessage = ACommands[i].HelpMessage ?? "N/A" });
+			IAmGod.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandsHandler) { HelpMessage = ACommands[i].HelpMessage ?? "N/A" });
 			PluginLog.LogDebug("CommandManager: Loaded /" + ACommands[i].CommandName);
 		}
 	}
@@ -42,32 +44,32 @@ public static class TRPCommandManager
 	{
 		for (int i = 0; i < ACommands.Length; i++)
 		{
-			Service.commandManager.RemoveHandler("/" + ACommands[i].CommandName);
+			IAmGod.commandManager.RemoveHandler("/" + ACommands[i].CommandName);
 			PluginLog.LogDebug("CommandManager: Destroyed /" + ACommands[i].CommandName);
 		}
 	}
 
-	public static void CommandHandler(string command, string arguments)
+	public static void CommandsHandler(string command, string arguments)
 	{
 		switch (command)
 		{
 			case "/trp":
-				Service.plugin.TRPWindowMain.IsOpen = !Service.plugin.TRPWindowMain.IsOpen;
+				IAmGod.plugin.TRPWindowMain.IsOpen = !IAmGod.plugin.TRPWindowMain.IsOpen;
 				break;
 			case "/trpq":
-				Service.plugin.QuestListWindow.IsOpen = true;
+				IAmGod.plugin.QuestListWindow.IsOpen = true;
 				break;
 			case "/trpqa":
-				Service.plugin.QuestListWindow.IncrementCurrentQuestGoal();
+				IAmGod.plugin.QuestListWindow.IncrementCurrentQuestGoal();
 				break;
 			case "/trpqb":
-				Service.questService.BeginQuest(arguments);
+				IAmGod.questService.BeginQuest(arguments);
 				break;
 			case "/trpqt":
-				Service.questService.TriggerCommand(arguments);
+				IAmGod.questService.TriggerCommand(arguments);
 				break;
 			case "/trpcurrency":
-				Service.plugin.currencyWindow.IsOpen = !Service.plugin.currencyWindow.IsOpen;
+				IAmGod.plugin.currencyWindow.IsOpen = !IAmGod.plugin.currencyWindow.IsOpen;
 				break;
 		}
 	}

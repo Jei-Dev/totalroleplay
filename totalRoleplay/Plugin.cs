@@ -1,6 +1,7 @@
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using totalRoleplay.Handlers;
+using totalRoleplay.Service;
 using totalRoleplay.Windows;
 
 namespace totalRoleplay
@@ -14,22 +15,22 @@ namespace totalRoleplay
 		public WindowSystem WindowSystem = new("totalRoleplay");
 
 		public ConfigWindow ConfigWindow { get; init; }
-		public TRPWindowMain TRPWindowMain { get; init; }
+		public MainWindow TRPWindowMain { get; init; }
 		public QuestListWindow QuestListWindow { get; init; }
 		public currencyWindow currencyWindow { get; init; }
 
 		public Plugin(DalamudPluginInterface pluginInterface)
 		{
 
-			pluginInterface.Create<Service>();
+			pluginInterface.Create<IAmGod>();
 
-			Service.plugin = this;
-			Service.pluginConfig = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-			Service.pluginConfig.Initialize(pluginInterface);
-			Service.questService = new QuestService(pluginInterface);
+			IAmGod.plugin = this;
+			IAmGod.pluginConfig = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+			IAmGod.pluginConfig.Initialize(pluginInterface);
+			IAmGod.questService = new QuestService(pluginInterface);
 
 			ConfigWindow = new ConfigWindow();
-			TRPWindowMain = new TRPWindowMain();
+			TRPWindowMain = new MainWindow();
 			QuestListWindow = new QuestListWindow(this);
 			currencyWindow = new currencyWindow();
 
@@ -38,15 +39,15 @@ namespace totalRoleplay
 			WindowSystem.AddWindow(QuestListWindow);
 			WindowSystem.AddWindow(currencyWindow);
 
-			TRPCommandManager.Load();
+			CommandHandler.Load();
 			/*
 			 * We don't need to keep this, however its here for Histories sake. (Remove when cleaning code for production)
-			Service.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
-			Service.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
-			Service.commandManager.AddHandler("/trpqa", new CommandInfo(OnCommand));
-			Service.commandManager.AddHandler("/trpqb", new CommandInfo(OnCommand));
-			Service.commandManager.AddHandler("/trpqt", new CommandInfo(OnCommand));
-			Service.commandManager.AddHandler("/trpcurrency", new CommandInfo(OnCommand) { HelpMessage = "Shows Total Roleplay's Currency Window." });
+			IAmGod.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
+			IAmGod.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
+			IAmGod.commandManager.AddHandler("/trpqa", new CommandInfo(OnCommand));
+			IAmGod.commandManager.AddHandler("/trpqb", new CommandInfo(OnCommand));
+			IAmGod.commandManager.AddHandler("/trpqt", new CommandInfo(OnCommand));
+			IAmGod.commandManager.AddHandler("/trpcurrency", new CommandInfo(OnCommand) { HelpMessage = "Shows Total Roleplay's Currency Window." });
 			*/
 			pluginInterface.UiBuilder.Draw += DrawUI;
 			pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -54,19 +55,19 @@ namespace totalRoleplay
 
 		public void Dispose()
 		{
-			TRPCommandManager.UnLoad();
+			CommandHandler.UnLoad();
 			this.WindowSystem.RemoveAllWindows();
 
 			ConfigWindow.Dispose();
 			TRPWindowMain.Dispose();
 
 			/*
-			Service.commandManager.RemoveHandler("/trp");
-			Service.commandManager.RemoveHandler("/trpq");
-			Service.commandManager.RemoveHandler("/trpqa");
-			Service.commandManager.RemoveHandler("/trpqb");
-			Service.commandManager.RemoveHandler("/trpqt");
-			Service.commandManager.RemoveHandler("/trpcurrency");
+			IAmGod.commandManager.RemoveHandler("/trp");
+			IAmGod.commandManager.RemoveHandler("/trpq");
+			IAmGod.commandManager.RemoveHandler("/trpqa");
+			IAmGod.commandManager.RemoveHandler("/trpqb");
+			IAmGod.commandManager.RemoveHandler("/trpqt");
+			IAmGod.commandManager.RemoveHandler("/trpcurrency");
 			*/
 		}
 		/*
@@ -85,10 +86,10 @@ namespace totalRoleplay
 					QuestListWindow.IncrementCurrentQuestGoal();
 					break;
 				case "/trpqb":
-					Service.questService.BeginQuest(args);
+					IAmGod.questService.BeginQuest(args);
 					break;
 				case "/trpqt":
-					Service.questService.TriggerCommand(args);
+					IAmGod.questService.TriggerCommand(args);
 					break;
 				case "/trpcurrency":
 					currencyWindow.IsOpen = !currencyWindow.IsOpen;

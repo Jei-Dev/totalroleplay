@@ -3,12 +3,13 @@ using Dalamud.Logging;
 using ImGuiNET;
 using System;
 using System.Numerics;
+using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
-public class TRPWindowMain : Window, IDisposable
+public class MainWindow : Window, IDisposable
 {
-	public TRPWindowMain() : base("Total Roleplay")
+	public MainWindow() : base("Total Roleplay")
 	{
 		Flags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 		this.SizeConstraints = new WindowSizeConstraints
@@ -22,12 +23,12 @@ public class TRPWindowMain : Window, IDisposable
 
 	public override void Draw()
 	{
-		var getBooleanProperty = Service.pluginConfig.BooleanProperty;
+		var getBooleanProperty = IAmGod.pluginConfig.BooleanProperty;
 		ImGui.Text($"The random config bool is {getBooleanProperty}");
 
 		if (ImGui.Button("Show Settings"))
 		{
-			Service.plugin.DrawConfigUI();
+			IAmGod.plugin.DrawConfigUI();
 		}
 
 		ImGui.Spacing();
