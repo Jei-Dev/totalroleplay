@@ -71,6 +71,9 @@ public static class CommandHandler
 			case "/trpcurrency":
 				IAmGod.plugin.currencyWindow.IsOpen = !IAmGod.plugin.currencyWindow.IsOpen;
 				break;
+			case "/trpfakeDialogue":
+				IAmGod.plugin.fakeDialogueWindow.IsOpen = !IAmGod.plugin.fakeDialogueWindow.IsOpen;
+				break;
 		}
 	}
 }

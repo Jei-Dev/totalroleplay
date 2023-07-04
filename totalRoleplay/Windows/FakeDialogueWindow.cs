@@ -1,38 +1,37 @@
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using ImGuiNET;
 using System;
 using System.IO;
 using System.Numerics;
+using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
 public class FakeDialogueWindow : Window, IDisposable
 {
-	public FakeDialogueWindow() : base("Fake Dialogue Window")
+	private readonly ImGuiScene.TextureWrap backgroundTexture;
+	private readonly FakeDialogueHandler dialogueHandler;
+	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler) : base("Fake Dialogue Window")
 	{
-		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
-		this.Size = new Vector2(232, 75);
-		this.SizeCondition = ImGuiCond.Always;
+		this.dialogueHandler = dialogueHandler;
+		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
 
-		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "images/FFXIVEmptyDialogueBox.png");
-		var dialogueBox = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
+		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "FFXIVEmptyDialogueBox.png");
+		backgroundTexture = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
+		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
 	}
 
 	public void Dispose()
 	{
-
+		backgroundTexture.Dispose();
 	}
 
 	public override void Draw()
 	{
-		// can't ref a property, so use a local copy
-		var configValue = IAmGod.pluginConfig.BooleanProperty;
-		if (ImGui.Checkbox("Random Config Bool", ref configValue))
-		{
-			IAmGod.pluginConfig.BooleanProperty = configValue;
-			// can save immediately on change, if you don't want to provide a "Save and Close" button
-			IAmGod.pluginConfig.Save();
-		}
+		ImGui.Image(backgroundTexture.ImGuiHandle, new Vector2(backgroundTexture.Width, backgroundTexture.Height));
+		ImGui.SetCursorPos(new Vector2(55, 30));
+		ImGui.Text(dialogueHandler.characterName ?? "John Doe the Doeist");
 	}
 }
