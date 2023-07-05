@@ -4,6 +4,7 @@ using Dalamud.Logging;
 using Dalamud.Plugin;
 using System;
 using totalRoleplay.Service;
+using totalRoleplay.Windows;
 
 namespace totalRoleplay.Handlers;
 
@@ -72,7 +73,15 @@ public static class CommandHandler
 				IAmGod.plugin.currencyWindow.IsOpen = !IAmGod.plugin.currencyWindow.IsOpen;
 				break;
 			case "/trpfakeDialogue":
-				IAmGod.plugin.fakeDialogueWindow.IsOpen = !IAmGod.plugin.fakeDialogueWindow.IsOpen;
+				var fakeDialogueWin = IAmGod.plugin.fakeDialogueWindow;
+				var fakeDialogueTimer = fakeDialogueWin.sw.IsRunning;
+				fakeDialogueWin.IsOpen = !fakeDialogueWin.IsOpen;
+				if (!fakeDialogueWin.IsOpen)
+				{
+					fakeDialogueWin.sw.Reset();
+					PluginLog.LogDebug("Stopped dialogue timer? " + fakeDialogueTimer);
+				}
+				else { fakeDialogueWin.sw.Start(); PluginLog.LogDebug("Started dialogue timer? " + !fakeDialogueTimer); }
 				break;
 		}
 	}

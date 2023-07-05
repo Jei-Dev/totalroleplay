@@ -1,5 +1,6 @@
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
@@ -47,5 +48,8 @@ namespace totalRoleplay.Service
 
 		[PluginService]
 		public static GameGui gameGui { get; private set; } = null!;
+
+		[PluginService]
+		public static KeyState keyState { get; private set; } = null!;
 	}
 }

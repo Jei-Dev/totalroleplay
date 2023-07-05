@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState.Keys;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using totalRoleplay.Handlers;
@@ -35,7 +36,7 @@ namespace totalRoleplay
 			TRPWindowMain = new MainWindow();
 			QuestListWindow = new QuestListWindow(this);
 			currencyWindow = new currencyWindow();
-			fakeDialogueWindow = new FakeDialogueWindow(fakeHandler);
+			fakeDialogueWindow = new FakeDialogueWindow(fakeHandler, IAmGod.keyState);
 
 			WindowSystem.AddWindow(ConfigWindow);
 			WindowSystem.AddWindow(TRPWindowMain);
