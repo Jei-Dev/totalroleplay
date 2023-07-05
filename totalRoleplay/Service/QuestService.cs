@@ -56,19 +56,33 @@ public class QuestService : IServiceType
         }
     }
 
-	public bool CanInteractWithTarget(uint target) {
-		foreach (var activeQuest in ActiveQuests) {
-            var quest = Quests[activeQuest.QuestId];
-            var state = quest.States[activeQuest.CurrentState];
-			foreach (var trigger in state.Triggers) {
-                PluginLog.Log($"aaasa {trigger.When.InteractWithObject} {target}");
-                if (trigger.When.InteractWithObject == target) {
-                    return true;
-                }
+	private (string, Model.QuestStateTriggerAction)? GetInteractionTriggerForTarget(uint target) {
+		foreach (var activeQuest in ActiveQuests)
+		{
+			var quest = Quests[activeQuest.QuestId];
+			var state = quest.States[activeQuest.CurrentState];
+			foreach (var trigger in state.Triggers)
+			{
+				PluginLog.Log($"aaasa {trigger.When.InteractWithObject} {target}");
+				if (trigger.When.InteractWithObject == target)
+				{
+					return (activeQuest.QuestId, trigger.Then);
+				}
 			}
-        }
-        return false;
+		}
+		return null;
+	}
+
+	public bool CanInteractWithTarget(uint target) {
+		return GetInteractionTriggerForTarget(target) != null;
     }
+
+	public void InteractWithTarget(uint target) {
+		var trigger = GetInteractionTriggerForTarget(target);
+		if (trigger.HasValue) {
+			ExecuteTriggerActions(trigger.Value.Item1, trigger.Value.Item2);
+		}
+	}
 
     private void ExecuteTriggerActions(string questId, Model.QuestStateTriggerAction action)
     {
