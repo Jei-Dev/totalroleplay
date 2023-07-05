@@ -47,5 +47,8 @@ namespace totalRoleplay.Service
 
 		[PluginService]
 		public static GameGui gameGui { get; private set; } = null!;
-	}
+
+        [PluginService]
+        public static TargetManager targetManager { get; private set; } = null!;
+    }
 }
