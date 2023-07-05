@@ -6,7 +6,7 @@ namespace totalRoleplay.Handlers;
 public class FakeDialogueHandler
 {
 	public delegate void onEndDialogueClose();
-	public event onEndDialogueClose onEndDialogue;
+	public event onEndDialogueClose? OnEndDialogue;
 	public record DialogueText
 	{
 		public string? pageID { get; set; }
@@ -26,20 +26,15 @@ public class FakeDialogueHandler
 	public void endFakeDialogue()
 	{
 		currentPage = 0;
-		onEndDialogue();
+		OnEndDialogue?.Invoke();
 	}
 	public void proceedToNextPage()
 	{
-		var nextPage = 0;
-		if (currentPage < currentPage + 1 && nextPage == 0)
+		currentPage++;
+		PluginLog.Debug("Page Number: " + currentPage);
+		if (currentPage == dialogueText.Length)
 		{
-			Math.Clamp(currentPage++, 0, dialogueText.Length - 1);
-			PluginLog.Debug("Page Number: " + currentPage);
-			nextPage = 1;
-			if (currentPage == dialogueText.Length)
-			{
-				endFakeDialogue();
-			}
+			endFakeDialogue();
 		}
 	}
 }

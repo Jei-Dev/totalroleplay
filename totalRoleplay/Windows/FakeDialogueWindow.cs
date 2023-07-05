@@ -31,14 +31,14 @@ public class FakeDialogueWindow : Window, IDisposable
 		backgroundTexture = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
 		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
 
-		dialogueHandler.onEndDialogue += onEndDialogue;
+		dialogueHandler.OnEndDialogue += onEndDialogue;
 	}
 
 	public void Dispose()
 	{
 		backgroundTexture.Dispose();
 		sw.Reset();
-		dialogueHandler.onEndDialogue -= onEndDialogue;
+		dialogueHandler.OnEndDialogue -= onEndDialogue;
 	}
 
 	public override void Draw()
@@ -51,12 +51,12 @@ public class FakeDialogueWindow : Window, IDisposable
 		ImGui.TextColored(new Vector4(0, 0, 0, 255),
 			dialogueHandler.dialogueText[dialogueHandler.currentPage]
 			.pageText[..(int)displayedCharacters]);
-		ImGui.SetNextFrameWantCaptureKeyboard(true);
+		ImGui.GetIO().WantTextInput = true;
 		HandleInput();
 	}
 	private void HandleInput()
 	{
-		var space = keyState[VirtualKey.SPACE];
+		var space = ImGui.IsKeyPressed(ImGuiKey.Space);
 		if (space && !prevSpace)
 		{
 			sw.Restart();

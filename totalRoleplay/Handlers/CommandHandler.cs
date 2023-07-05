@@ -2,6 +2,7 @@ using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using ImGuiNET;
 using System;
 using totalRoleplay.Service;
 using totalRoleplay.Windows;
@@ -80,6 +81,7 @@ public static class CommandHandler
 				{
 					fakeDialogueWin.sw.Reset();
 					PluginLog.LogDebug("Stopped dialogue timer? " + fakeDialogueTimer);
+					ImGui.GetIO().WantTextInput = false;
 				}
 				else { fakeDialogueWin.sw.Start(); PluginLog.LogDebug("Started dialogue timer? " + !fakeDialogueTimer); }
 				break;
