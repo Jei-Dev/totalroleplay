@@ -1,18 +1,40 @@
-using Dalamud.Interface.Windowing;
-using ImGuiNET;
+using Dalamud.Logging;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace totalRoleplay.Handlers;
 
 public class FakeDialogueHandler
 {
-	public FakeDialogueHandler()
+	public delegate void onEndDialogueClose();
+	public event onEndDialogueClose? OnEndDialogue;
+	public record DialogueText
 	{
+		public string? pageID { get; set; }
+		public required string pageText { get; set; }
+		public required string characterName { get; set; }
+	}
+	public int currentPage = 0;
+	public FakeDialogueHandler() { }
 
+	public DialogueText[] dialogueText =
+	{
+		new DialogueText  { pageID = null, pageText = "Woah! I am some text!", characterName = "Zelda Wynters"},
+		new DialogueText  { pageID = null, pageText = "I am page 2!! :D!!", characterName = "Zelda Wynters"}
+	};
+
+	public void startFakeDialogue() { }
+	public void endFakeDialogue()
+	{
+		currentPage = 0;
+		OnEndDialogue?.Invoke();
+	}
+	public void proceedToNextPage()
+	{
+		currentPage++;
+		PluginLog.Debug("Page Number: " + currentPage);
+		if (currentPage == dialogueText.Length)
+		{
+			endFakeDialogue();
+		}
 	}
 }

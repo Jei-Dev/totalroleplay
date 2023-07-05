@@ -1,38 +1,73 @@
+using Dalamud.Game.ClientState.Keys;
 using Dalamud.Interface.Windowing;
+using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using ImGuiNET;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
+using System.Timers;
+using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
 public class FakeDialogueWindow : Window, IDisposable
 {
-	public FakeDialogueWindow() : base("Fake Dialogue Window")
+	private readonly ImGuiScene.TextureWrap backgroundTexture;
+	private readonly FakeDialogueHandler dialogueHandler;
+	private readonly KeyState keyState;
+	private readonly double textSpeed = 0.05;
+	public readonly Stopwatch sw = new();
+	private bool prevSpace = false;
+	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState) : base("Fake Dialogue Window")
 	{
-		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
-		this.Size = new Vector2(232, 75);
-		this.SizeCondition = ImGuiCond.Always;
+		this.dialogueHandler = dialogueHandler;
+		this.keyState = keyState;
+		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
 
-		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "images/FFXIVEmptyDialogueBox.png");
-		var dialogueBox = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
+		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "FFXIVEmptyDialogueBox.png");
+		backgroundTexture = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
+		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
+
+		dialogueHandler.OnEndDialogue += onEndDialogue;
 	}
 
 	public void Dispose()
 	{
-
+		backgroundTexture.Dispose();
+		sw.Reset();
+		dialogueHandler.OnEndDialogue -= onEndDialogue;
 	}
 
 	public override void Draw()
 	{
-		// can't ref a property, so use a local copy
-		var configValue = IAmGod.pluginConfig.BooleanProperty;
-		if (ImGui.Checkbox("Random Config Bool", ref configValue))
+		ImGui.Image(backgroundTexture.ImGuiHandle, new Vector2(backgroundTexture.Width, backgroundTexture.Height));
+		ImGui.SetCursorPos(new Vector2(55, 30));
+		ImGui.Text(dialogueHandler.dialogueText[Math.Clamp(dialogueHandler.currentPage, 0, dialogueHandler.currentPage)].characterName ?? "No Name");
+		ImGui.SetCursorPos(new Vector2(45, 70));
+		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * textSpeed, 0, dialogueHandler.dialogueText[dialogueHandler.currentPage].pageText.Length);
+		ImGui.TextColored(new Vector4(0, 0, 0, 255),
+			dialogueHandler.dialogueText[dialogueHandler.currentPage]
+			.pageText[..(int)displayedCharacters]);
+		ImGui.GetIO().WantTextInput = true;
+		HandleInput();
+	}
+	private void HandleInput()
+	{
+		var space = ImGui.IsKeyPressed(ImGuiKey.Space);
+		if (space && !prevSpace)
 		{
-			IAmGod.pluginConfig.BooleanProperty = configValue;
-			// can save immediately on change, if you don't want to provide a "Save and Close" button
-			IAmGod.pluginConfig.Save();
+			sw.Restart();
+			dialogueHandler.proceedToNextPage();
 		}
+		prevSpace = space;
+	}
+
+	private void onEndDialogue()
+	{
+		this.IsOpen = false;
+		sw.Reset();
 	}
 }
