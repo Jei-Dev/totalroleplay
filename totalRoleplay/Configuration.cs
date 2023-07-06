@@ -1,4 +1,5 @@
 using Dalamud.Configuration;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using System;
 
@@ -9,10 +10,12 @@ namespace totalRoleplay
 	{
 		public bool showTextNotify { get; set; } = true;
 
-		private static int VersionLatest = 0;
+		private readonly static int VersionLatest = 0;
 		public int Version { get; set; } = VersionLatest;
 
 		public bool BooleanProperty { get; set; } = true;
+
+		public float dialogueDrawSpeed { get; set; } = 0.05f;
 
 		// the below exist just to make saving less cumbersome
 		[NonSerialized]
@@ -29,6 +32,7 @@ namespace totalRoleplay
 		public void Save()
 		{
 			pluginInterface.SavePluginConfig(this);
+			PluginLog.Debug("Saved Configuration");
 		}
 	}
 }

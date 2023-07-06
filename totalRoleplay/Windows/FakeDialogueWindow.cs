@@ -18,7 +18,7 @@ public class FakeDialogueWindow : Window, IDisposable
 	private readonly ImGuiScene.TextureWrap backgroundTexture;
 	private readonly FakeDialogueHandler dialogueHandler;
 	private readonly KeyState keyState;
-	private readonly double textSpeed = 0.05;
+	private readonly float textSpeed = IAmGod.pluginConfig.dialogueDrawSpeed;
 	public readonly Stopwatch sw = new();
 	private bool prevSpace = false;
 	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState) : base("Fake Dialogue Window")
