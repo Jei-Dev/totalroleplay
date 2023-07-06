@@ -23,7 +23,7 @@ public record QuestStateTrigger
 
 public record QuestStateTriggerCondition
 {
-    public long? InteractWithObject { get; init; }
+    public uint? InteractWithObject { get; init; }
     public string? Command { get; init; }
 }
 

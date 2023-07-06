@@ -1,21 +1,29 @@
 {
-    "q1": {
-        "title": "foo",
-        "description": "foooooo",
-        "initialState": "start",
-        "states": {
-            "start": {
-                "triggers": [
-                    {
-                        "when": {
-                            "command": "fooo"
-                        },
-                        "then": {
-                            "finishQuest": true
-                        }
-                    }
-                ]
-            }
-        }
-    }
+	"q1": {
+		"title": "foo",
+		"description": "foooooo",
+		"initialState": "start",
+		"states": {
+			"start": {
+				"triggers": [
+					{
+						"when": {
+							"command": "fooo"
+						},
+						"then": {
+							"finishQuest": true
+						}
+					},
+					{
+						"when": {
+							"interactWithObject": 1011080
+						},
+						"then": {
+							"finishQuest": true
+						}
+					}
+				]
+			}
+		}
+	}
 }

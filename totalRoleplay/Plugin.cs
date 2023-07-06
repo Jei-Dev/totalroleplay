@@ -20,6 +20,7 @@ namespace totalRoleplay
 		public QuestListWindow QuestListWindow { get; init; }
 		public currencyWindow currencyWindow { get; init; }
 		public FakeDialogueWindow fakeDialogueWindow { get; init; }
+		public DialogueTriggerWindow dialogueTriggerWindow { get; init; }
 
 		public Plugin(DalamudPluginInterface pluginInterface)
 		{
@@ -37,12 +38,14 @@ namespace totalRoleplay
 			QuestListWindow = new QuestListWindow(this);
 			currencyWindow = new currencyWindow();
 			fakeDialogueWindow = new FakeDialogueWindow(fakeHandler, IAmGod.keyState);
+			dialogueTriggerWindow = new DialogueTriggerWindow(IAmGod.targetManager, IAmGod.questService);
 
 			WindowSystem.AddWindow(ConfigWindow);
 			WindowSystem.AddWindow(TRPWindowMain);
 			WindowSystem.AddWindow(QuestListWindow);
 			WindowSystem.AddWindow(currencyWindow);
 			WindowSystem.AddWindow(fakeDialogueWindow);
+			WindowSystem.AddWindow(dialogueTriggerWindow);
 
 			CommandHandler.Load();
 			/*
@@ -68,6 +71,7 @@ namespace totalRoleplay
 			QuestListWindow.Dispose();
 			currencyWindow.Dispose();
 			fakeDialogueWindow.Dispose();
+			dialogueTriggerWindow.Dispose();
 
 			/*
 			IAmGod.commandManager.RemoveHandler("/trp");

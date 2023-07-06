@@ -51,5 +51,8 @@ namespace totalRoleplay.Service
 
 		[PluginService]
 		public static KeyState keyState { get; private set; } = null!;
+
+		[PluginService]
+		public static TargetManager targetManager { get; private set; } = null!;
 	}
 }
