@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Keys;
 using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
@@ -21,7 +22,9 @@ public class FakeDialogueWindow : Window, IDisposable
 	private readonly float textSpeed = IAmGod.pluginConfiguration.dialogueDrawSpeed;
 	public readonly Stopwatch sw = new();
 	private bool prevSpace = false;
-	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState) : base("Fake Dialogue Window")
+	private readonly ClientState clientState;
+
+	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState) : base("Fake Dialogue Window")
 	{
 		this.dialogueHandler = dialogueHandler;
 		this.keyState = keyState;
@@ -31,26 +34,30 @@ public class FakeDialogueWindow : Window, IDisposable
 		backgroundTexture = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
 		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
 
-		dialogueHandler.OnEndDialogue += onEndDialogue;
+		this.clientState = clientState;
+
+		dialogueHandler.OnStartDialogue += OnStartDialogue;
+		dialogueHandler.OnEndDialogue += OnEndDialogue;
 	}
 
 	public void Dispose()
 	{
 		backgroundTexture.Dispose();
 		sw.Reset();
-		dialogueHandler.OnEndDialogue -= onEndDialogue;
+		dialogueHandler.OnStartDialogue -= OnStartDialogue;
+		dialogueHandler.OnEndDialogue -= OnEndDialogue;
 	}
 
 	public override void Draw()
 	{
+		var currentLine = dialogueHandler.CurrentDialogueLine;
 		ImGui.Image(backgroundTexture.ImGuiHandle, new Vector2(backgroundTexture.Width, backgroundTexture.Height));
 		ImGui.SetCursorPos(new Vector2(55, 30));
-		ImGui.Text(dialogueHandler.dialogueText[Math.Clamp(dialogueHandler.currentPage, 0, dialogueHandler.currentPage)].characterName ?? "No Name");
+		ImGui.Text(currentLine?.ActorName.Replace("{YOU}", clientState.LocalPlayer?.Name.ToString()) ?? "No Name");
 		ImGui.SetCursorPos(new Vector2(45, 70));
-		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * textSpeed, 0, dialogueHandler.dialogueText[dialogueHandler.currentPage].pageText.Length);
+		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * textSpeed, 0, currentLine?.Content?.Length ?? 0);
 		ImGui.TextColored(new Vector4(0, 0, 0, 255),
-			dialogueHandler.dialogueText[dialogueHandler.currentPage]
-			.pageText[..(int)displayedCharacters]);
+						  currentLine?.Content?[..(int)displayedCharacters] ?? "");
 		ImGui.GetIO().WantTextInput = true;
 		HandleInput();
 	}
@@ -65,7 +72,12 @@ public class FakeDialogueWindow : Window, IDisposable
 		prevSpace = space;
 	}
 
-	private void onEndDialogue()
+	private void OnStartDialogue()
+	{
+		this.IsOpen = true;
+		sw.Restart();
+	}
+	private void OnEndDialogue()
 	{
 		this.IsOpen = false;
 		sw.Reset();

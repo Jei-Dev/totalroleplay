@@ -5,32 +5,41 @@ using Dalamud.Plugin;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using totalRoleplay.Handlers;
+using totalRoleplay.Model;
 
 namespace totalRoleplay.Service;
 
 [PluginInterface]
 public class QuestService : IServiceType
 {
-	public Dictionary<string, Model.Quest> Quests { get; init; }
-	public List<Model.ActiveQuest> ActiveQuests { get; } = new List<Model.ActiveQuest>();
+	public Dictionary<string, Quest> Quests { get; init; }
+	public List<ActiveQuest> ActiveQuests { get; } = new List<ActiveQuest>();
+
+	public Dictionary<string, DialogueSequence> Dialogues { get; init; }
 
 	public delegate void OnQuestComplete(string questId);
 	public event OnQuestComplete? QuestComplete;
 
-	public QuestService(DalamudPluginInterface pluginInterface)
+	private readonly FakeDialogueHandler dialogueHandler;
+
+	public QuestService(DalamudPluginInterface pluginInterface, FakeDialogueHandler dialogueHandler)
 	{
 		var questJsonPath = Path.Join(pluginInterface.AssemblyLocation.Directory!.FullName, "quests.json");
 		PluginLog.LogInformation(questJsonPath);
 		var questJson = File.ReadAllText(questJsonPath);
-		Quests = JsonSerializer.Deserialize<Dictionary<string, Model.Quest>>(
+		var story = JsonSerializer.Deserialize<Story>(
 			questJson,
 			new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
 		)!;
+		Quests = story.Quests;
+		Dialogues = story.Dialogues;
+		this.dialogueHandler = dialogueHandler;
 	}
 
 	public void BeginQuest(string questId)
 	{
-		ActiveQuests.Add(new Model.ActiveQuest
+		ActiveQuests.Add(new ActiveQuest
 		{
 			QuestId = questId,
 			CurrentState = Quests[questId].InitialState,
@@ -56,7 +65,7 @@ public class QuestService : IServiceType
 		}
 	}
 
-	private (string, Model.QuestStateTriggerAction)? GetInteractionTriggerForTarget(uint target)
+	private (string, QuestStateTriggerAction)? GetInteractionTriggerForTarget(uint target)
 	{
 		foreach (var activeQuest in ActiveQuests)
 		{
@@ -88,11 +97,18 @@ public class QuestService : IServiceType
 		}
 	}
 
-	private void ExecuteTriggerActions(string questId, Model.QuestStateTriggerAction action)
+	private void ExecuteTriggerActions(string questId, QuestStateTriggerAction action)
 	{
 		if (action.GoToState != null)
 		{
 			ActiveQuests.FindAll(aq => aq.QuestId == questId).ForEach(aq => aq.CurrentState = action.GoToState);
+		}
+		if (action.BeginDialogueSequence != null)
+		{
+			dialogueHandler.startFakeDialogue(
+				Dialogues[action.BeginDialogueSequence],
+				questActionTriggerHandler: action => ExecuteTriggerActions(questId, action)
+			);
 		}
 		if (action.FinishQuest)
 		{

@@ -8,15 +8,6 @@ using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
-public record Quest
-{
-	public required string Name { get; init; }
-	public required string Description { get; init; }
-	public int goalCurrent { get; set; }
-	public int goalFinal { get; init; }
-	public Boolean questSelected { get; set; } = false;
-};
-
 public class QuestListWindow : Window, IDisposable
 {
 	private string? selectedQuest;
