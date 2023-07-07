@@ -95,6 +95,10 @@ public class QuestService : IServiceType
 		{
 			ExecuteTriggerActions(trigger.Value.Item1, trigger.Value.Item2);
 		}
+		else
+		{
+			PluginLog.LogWarning("Target has no dialogue.");
+		}
 	}
 
 	private void ExecuteTriggerActions(string questId, QuestStateTriggerAction action)

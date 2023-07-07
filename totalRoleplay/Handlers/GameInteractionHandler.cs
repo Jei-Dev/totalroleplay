@@ -13,13 +13,13 @@ public class GameInteractionHandler : IDisposable
 	private readonly PluginConfiguration pluginConfig;
 	private readonly DalamudContextMenu dalamudContextMenu;
 	private readonly ObjectTable objectTable;
-	private readonly FakeDialogueHandler fakeDialogueHandler;
-	public GameInteractionHandler(PluginConfiguration _pluginConfig, DalamudContextMenu _dalamudContextMenu, ObjectTable _objectTable, FakeDialogueHandler _fakeHandler)
+	private readonly QuestService questService;
+	public GameInteractionHandler(PluginConfiguration _pluginConfig, DalamudContextMenu _dalamudContextMenu, ObjectTable _objectTable, QuestService _questService)
 	{
 		pluginConfig = _pluginConfig;
 		dalamudContextMenu = _dalamudContextMenu;
 		objectTable = _objectTable;
-		fakeDialogueHandler = _fakeHandler;
+		questService = _questService;
 
 		_dalamudContextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
 	}
@@ -43,7 +43,7 @@ public class GameInteractionHandler : IDisposable
 
 		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
 		{
-			fakeDialogueHandler.startFakeDialogue();
+			questService.InteractWithTarget(gameObject.DataId);
 			// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
 		}, false));
 
