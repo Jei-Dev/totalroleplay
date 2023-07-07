@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Keys;
+using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
@@ -23,8 +24,9 @@ public class FakeDialogueWindow : Window, IDisposable
 	public readonly Stopwatch sw = new();
 	private bool prevSpace = false;
 	private readonly ClientState clientState;
+	private readonly TargetManager targetManager;
 
-	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState) : base("Fake Dialogue Window")
+	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState, TargetManager targetManager) : base("Fake Dialogue Window")
 	{
 		this.dialogueHandler = dialogueHandler;
 		this.keyState = keyState;
@@ -35,6 +37,7 @@ public class FakeDialogueWindow : Window, IDisposable
 		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
 
 		this.clientState = clientState;
+		this.targetManager = targetManager;
 
 		dialogueHandler.OnStartDialogue += OnStartDialogue;
 		dialogueHandler.OnEndDialogue += OnEndDialogue;
@@ -53,7 +56,10 @@ public class FakeDialogueWindow : Window, IDisposable
 		var currentLine = dialogueHandler.CurrentDialogueLine;
 		ImGui.Image(backgroundTexture.ImGuiHandle, new Vector2(backgroundTexture.Width, backgroundTexture.Height));
 		ImGui.SetCursorPos(new Vector2(55, 30));
-		ImGui.Text(currentLine?.ActorName.Replace("{YOU}", clientState.LocalPlayer?.Name.ToString()) ?? "No Name");
+		ImGui.Text(currentLine?.ActorName
+				   .Replace("{YOU}", clientState.LocalPlayer?.Name.ToString())
+				   .Replace("{TARGET}", targetManager.Target?.Name.ToString())
+				   ?? "No Name");
 		ImGui.SetCursorPos(new Vector2(45, 70));
 		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * textSpeed, 0, currentLine?.Content?.Length ?? 0);
 		ImGui.TextColored(new Vector4(0, 0, 0, 255),

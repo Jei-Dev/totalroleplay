@@ -45,7 +45,7 @@ namespace totalRoleplay
 			TRPWindowMain = new MainWindow();
 			QuestListWindow = new QuestListWindow(this);
 			currencyWindow = new currencyWindow();
-			fakeDialogueWindow = new FakeDialogueWindow(fakeDialogueHandler, IAmGod.keyState, IAmGod.clientState);
+			fakeDialogueWindow = new FakeDialogueWindow(fakeDialogueHandler, IAmGod.keyState, IAmGod.clientState, IAmGod.targetManager);
 			dialogueTriggerWindow = new DialogueTriggerWindow(IAmGod.targetManager, IAmGod.questService);
 
 			WindowSystem.AddWindow(ConfigWindow);
