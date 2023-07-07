@@ -31,14 +31,14 @@ namespace totalRoleplay
 			IAmGod.plugin = this;
 			IAmGod.pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 			IAmGod.pluginConfiguration.Initialize(pluginInterface);
-			IAmGod.questService = new QuestService(pluginInterface);
-			var fakeHandler = new FakeDialogueHandler();
+			var dialogueHandler = new FakeDialogueHandler();
+			IAmGod.questService = new QuestService(pluginInterface, dialogueHandler);
 
 			ConfigWindow = new ConfigWindow();
 			TRPWindowMain = new MainWindow();
 			QuestListWindow = new QuestListWindow(this);
 			currencyWindow = new currencyWindow();
-			fakeDialogueWindow = new FakeDialogueWindow(fakeHandler, IAmGod.keyState);
+			fakeDialogueWindow = new FakeDialogueWindow(dialogueHandler, IAmGod.keyState, IAmGod.clientState);
 			dialogueTriggerWindow = new DialogueTriggerWindow(IAmGod.targetManager, IAmGod.questService);
 
 			WindowSystem.AddWindow(ConfigWindow);
