@@ -1,4 +1,6 @@
+using Dalamud.ContextMenu;
 using Dalamud.Game.ClientState.Keys;
+using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using totalRoleplay.Configuration;
@@ -14,14 +16,16 @@ namespace totalRoleplay
 
 		private DalamudPluginInterface PluginInterface { get; init; }
 		public PluginConfiguration pluginConfiguration { get; init; }
+		public DalamudContextMenu dalamudContextMenu { get; init; }
 		public WindowSystem WindowSystem = new("totalRoleplay");
-
 		public ConfigWindow ConfigWindow { get; init; }
 		public MainWindow TRPWindowMain { get; init; }
 		public QuestListWindow QuestListWindow { get; init; }
 		public currencyWindow currencyWindow { get; init; }
 		public FakeDialogueWindow fakeDialogueWindow { get; init; }
+		public FakeDialogueHandler fakeDialogueHandler { get; init; }
 		public DialogueTriggerWindow dialogueTriggerWindow { get; init; }
+		public GameInteractionHandler gameInteractionHandler { get; init; }
 
 		public Plugin(DalamudPluginInterface pluginInterface)
 		{
@@ -32,6 +36,9 @@ namespace totalRoleplay
 			IAmGod.pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 			IAmGod.pluginConfiguration.Initialize(pluginInterface);
 			IAmGod.questService = new QuestService(pluginInterface);
+			dalamudContextMenu = new DalamudContextMenu();
+			fakeDialogueHandler = new FakeDialogueHandler();
+			gameInteractionHandler = new GameInteractionHandler(IAmGod.pluginConfiguration, dalamudContextMenu, IAmGod.objectTable, fakeDialogueHandler);
 			var fakeHandler = new FakeDialogueHandler();
 
 			ConfigWindow = new ConfigWindow();
@@ -66,6 +73,7 @@ namespace totalRoleplay
 		{
 			CommandHandler.UnLoad();
 			this.WindowSystem.RemoveAllWindows();
+			dalamudContextMenu.Dispose();
 
 			ConfigWindow.Dispose();
 			TRPWindowMain.Dispose();

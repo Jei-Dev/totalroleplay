@@ -1,49 +1,56 @@
 using Dalamud.ContextMenu;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using totalRoleplay.Configuration;
+using totalRoleplay.Handlers;
+using totalRoleplay.Service;
 
-namespace totalRoleplay.Handlers
+namespace totalRoleplay.Handlers;
+public class GameInteractionHandler : IDisposable
 {
-	public class GameInteractionHandler : IDisposable
+	private readonly PluginConfiguration pluginConfig;
+	private readonly DalamudContextMenu dalamudContextMenu;
+	private readonly ObjectTable objectTable;
+	private readonly FakeDialogueHandler fakeDialogueHandler;
+	public GameInteractionHandler(PluginConfiguration _pluginConfig, DalamudContextMenu _dalamudContextMenu, ObjectTable _objectTable, FakeDialogueHandler _fakeHandler)
 	{
-		private readonly PluginConfiguration pluginConfig;
-		private readonly DalamudContextMenu _dalamudContextMenu;
-		public GameInteractionHandler(PluginConfiguration pluginConfig, DalamudContextMenu dalamudContextMenu)
+		pluginConfig = _pluginConfig;
+		dalamudContextMenu = _dalamudContextMenu;
+		objectTable = _objectTable;
+		fakeDialogueHandler = _fakeHandler;
+
+		_dalamudContextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
+	}
+	public void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
+	{
+		if (args.ObjectId == 0xE000000) { PluginLog.LogVerbose("Object ID does not match - Ignoring"); return; }
+		if (!pluginConfig.gameInteractionContextMenu) { PluginLog.LogVerbose("Ignoring Context Menu creation - User does not allow it"); return; }
+
+		AddContextMenu(args);
+	}
+
+	public void Dispose()
+	{
+		dalamudContextMenu.OnOpenGameObjectContextMenu -= OpenGameObjectContextMenu;
+	}
+
+	public void AddContextMenu(GameObjectContextMenuOpenArgs args)
+	{
+		var gameObject = objectTable.SearchById(args.ObjectId);
+		if (!gameObject) return;
+
+		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
 		{
-			_dalamudContextMenu = dalamudContextMenu;
+			fakeDialogueHandler.startFakeDialogue();
+			// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
+		}, false));
 
-			_dalamudContextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
-		}
-		public void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
+		var _QuestItem = "Empty Item";
+		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Give (" + _QuestItem + ")", (a) =>
 		{
-			if (args.ObjectId == 0xE000000) { PluginLog.LogVerbose("Object ID does not match - Ignoring"); return; }
-			if (!pluginConfig.gameInteractionContextMenu) { PluginLog.LogVerbose("Ignoring Context Menu creation - User does not allow it"); return; }
-
-			// Need logic to add Context Selection to all NPCs currently loaded
-			AddContextMenu(args);
-		}
-
-		public void Dispose()
-		{
-			_dalamudContextMenu.OnOpenGameObjectContextMenu -= OpenGameObjectContextMenu;
-		}
-
-		public void AddContextMenu(GameObjectContextMenuOpenArgs args)
-		{
-			// Needs player/npc null check
-
-			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk", (a) =>
-			{
-				// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
-			}, false));
-
-			var _QuestItem = "Empty Item";
-			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Give (" + _QuestItem + ")", (a) =>
-			{
-
-			}, false));
-		}
+			PluginLog.LogInformation("You gave a " + _QuestItem + " to " + gameObject.Name);
+		}, false));
 	}
 }

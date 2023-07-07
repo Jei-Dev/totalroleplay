@@ -22,7 +22,7 @@ public class FakeDialogueHandler
 		new DialogueText  { pageID = null, pageText = "I am page 2!! :D!!", characterName = "Zelda Wynters"}
 	};
 
-	public void startFakeDialogue() { }
+	public void startFakeDialogue() { PluginLog.LogWarning("No Dialogue for character"); }
 	public void endFakeDialogue()
 	{
 		currentPage = 0;
