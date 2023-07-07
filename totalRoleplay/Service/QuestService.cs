@@ -1,4 +1,6 @@
 using Dalamud;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Plugin;
@@ -65,7 +67,7 @@ public class QuestService : IServiceType
 		}
 	}
 
-	private (string, QuestStateTriggerAction)? GetInteractionTriggerForTarget(uint target)
+	private (string, QuestStateTriggerAction)? GetInteractionTriggerForTarget(GameObject target)
 	{
 		foreach (var activeQuest in ActiveQuests)
 		{
@@ -73,22 +75,33 @@ public class QuestService : IServiceType
 			var state = quest.States[activeQuest.CurrentState];
 			foreach (var trigger in state.Triggers)
 			{
-				//PluginLog.Log($"aaasa {trigger.When.InteractWithObject} {target}");
-				if (trigger.When.InteractWithObject == target)
+				var targetCond = trigger.When.InteractWithObject;
+				if (targetCond?.DataId != null && targetCond.DataId == target.DataId)
 				{
 					return (activeQuest.QuestId, trigger.Then);
+				}
+				if (targetCond?.Player != null && target is PlayerCharacter player)
+				{
+
+					if (
+						player.Name.ToString() == targetCond.Player.CharacterName &&
+						player.HomeWorld.GameData?.Name.ToString() == targetCond.Player.World
+					)
+					{
+						return (activeQuest.QuestId, trigger.Then);
+					}
 				}
 			}
 		}
 		return null;
 	}
 
-	public bool CanInteractWithTarget(uint target)
+	public bool CanInteractWithTarget(GameObject target)
 	{
 		return GetInteractionTriggerForTarget(target) != null;
 	}
 
-	public void InteractWithTarget(uint target)
+	public void InteractWithTarget(GameObject target)
 	{
 		var trigger = GetInteractionTriggerForTarget(target);
 		if (trigger.HasValue)

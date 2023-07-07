@@ -23,8 +23,20 @@ public record QuestStateTrigger
 
 public record QuestStateTriggerCondition
 {
-	public uint? InteractWithObject { get; init; }
+	public InteractionTarget? InteractWithObject { get; init; }
 	public string? Command { get; init; }
+}
+
+public record InteractionTarget
+{
+	public uint? DataId { get; init; }
+	public PlayerReference? Player { get; init; }
+}
+
+public record PlayerReference
+{
+	public required string CharacterName { get; init; }
+	public required string World { get; init; }
 }
 
 public record QuestStateTriggerAction

@@ -25,18 +25,18 @@ public class DialogueTriggerWindow : Window, IDisposable
 
 	public override bool DrawConditions()
 	{
-		var targetId = targetManager.Target?.DataId;
-		return targetId != null && questService.CanInteractWithTarget(targetId.Value);
+		var target = targetManager.Target;
+		return target != null && questService.CanInteractWithTarget(target);
 	}
 
 	public override void Draw()
 	{
 		if (ImGui.Button("Talk"))
 		{
-			var targetId = targetManager.Target?.DataId;
-			if (targetId != null)
+			var target = targetManager.Target;
+			if (target != null)
 			{
-				questService.InteractWithTarget(targetId.Value);
+				questService.InteractWithTarget(target);
 			}
 		}
 	}

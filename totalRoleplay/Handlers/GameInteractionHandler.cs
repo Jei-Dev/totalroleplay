@@ -43,7 +43,7 @@ public class GameInteractionHandler : IDisposable
 
 		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
 		{
-			questService.InteractWithTarget(gameObject.DataId);
+			questService.InteractWithTarget(gameObject);
 			// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
 		}, false));
 

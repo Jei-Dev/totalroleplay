@@ -15,7 +15,21 @@
                         }
                     }, {
                         "when": {
-                            "interactWithObject": 1011080
+                            "interactWithObject": {
+                                "dataId": 1011080
+                            }
+                        },
+                        "then": {
+                            "beginDialogueSequence": "talkToAttendant"
+                        }
+                    }, {
+                        "when": {
+                            "interactWithObject": {
+                                "player": {
+                                    "characterName": "Zelda Wynters",
+                                    "world": "Omega"
+                                }
+                            }
                         },
                         "then": {
                             "beginDialogueSequence": "talkToAttendant"
