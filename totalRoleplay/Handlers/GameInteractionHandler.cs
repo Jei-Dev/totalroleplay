@@ -41,16 +41,19 @@ public class GameInteractionHandler : IDisposable
 		var gameObject = objectTable.SearchById(args.ObjectId);
 		if (!gameObject) return;
 
-		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
+		if (questService.CanInteractWithTarget(gameObject))
 		{
-			questService.InteractWithTarget(gameObject);
-			// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
-		}, false));
+			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
+			{
+				questService.InteractWithTarget(gameObject);
+				// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
+			}, false));
 
-		var _QuestItem = "Empty Item";
-		args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Give (" + _QuestItem + ")", (a) =>
-		{
-			PluginLog.LogInformation("You gave a " + _QuestItem + " to " + gameObject.Name);
-		}, false));
+			var _QuestItem = "Empty Item";
+			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Give (" + _QuestItem + ")", (a) =>
+			{
+				PluginLog.LogInformation("You gave a " + _QuestItem + " to " + gameObject.Name);
+			}, false));
+		}
 	}
 }
