@@ -70,7 +70,7 @@ public class QuestListWindow : Window, IDisposable
 	/// </summary>
 	public void showQuestToast(Boolean complete)
 	{
-		var canShow = IAmGod.pluginConfig.showTextNotify;
+		var canShow = IAmGod.pluginConfiguration.showTextNotify;
 		if (canShow)
 		{
 			var questName = IAmGod.questService.Quests[selectedQuest!].Title;

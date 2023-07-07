@@ -20,16 +20,16 @@ public class ConfigWindow : Window, IDisposable
 	public override void Draw()
 	{
 		// can't ref a property, so use a local copy
-		var configValue = IAmGod.pluginConfig.BooleanProperty;
-		if (ImGui.Checkbox("Random Config Bool", ref configValue))
+		var configValue = IAmGod.pluginConfiguration.gameInteractionContextMenu;
+		if (ImGui.Checkbox("Enable Context Menu buttons", ref configValue))
 		{
-			IAmGod.pluginConfig.BooleanProperty = configValue;
+			IAmGod.pluginConfiguration.gameInteractionContextMenu = configValue;
 		}
 
-		var textDrawSpeed = IAmGod.pluginConfig.dialogueDrawSpeed;
+		var textDrawSpeed = IAmGod.pluginConfiguration.dialogueDrawSpeed;
 		if (ImGui.SliderFloat("Dialogue Speed", ref textDrawSpeed, 0.03f, 0.1f))
 		{
-			IAmGod.pluginConfig.dialogueDrawSpeed = textDrawSpeed;
+			IAmGod.pluginConfiguration.dialogueDrawSpeed = textDrawSpeed;
 		}
 
 
@@ -37,7 +37,7 @@ public class ConfigWindow : Window, IDisposable
 		ImGui.SetCursorPos(new Vector2(195, 60));
 		if (ImGui.Button("Save", new Vector2(50, 50)))
 		{
-			IAmGod.pluginConfig.Save();
+			IAmGod.pluginConfiguration.Save();
 			PluginLog.Debug("Save button hit");
 		}
 	}

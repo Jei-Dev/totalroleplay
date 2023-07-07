@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState.Keys;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using totalRoleplay.Configuration;
 using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 using totalRoleplay.Windows;
@@ -12,7 +13,7 @@ namespace totalRoleplay
 		public string Name => "Roleplay Totality";
 
 		private DalamudPluginInterface PluginInterface { get; init; }
-		public Configuration Configuration { get; init; }
+		public PluginConfiguration pluginConfiguration { get; init; }
 		public WindowSystem WindowSystem = new("totalRoleplay");
 
 		public ConfigWindow ConfigWindow { get; init; }
@@ -28,8 +29,8 @@ namespace totalRoleplay
 			pluginInterface.Create<IAmGod>();
 
 			IAmGod.plugin = this;
-			IAmGod.pluginConfig = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-			IAmGod.pluginConfig.Initialize(pluginInterface);
+			IAmGod.pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
+			IAmGod.pluginConfiguration.Initialize(pluginInterface);
 			IAmGod.questService = new QuestService(pluginInterface);
 			var fakeHandler = new FakeDialogueHandler();
 

@@ -23,8 +23,8 @@ public class MainWindow : Window, IDisposable
 
 	public override void Draw()
 	{
-		var getBooleanProperty = IAmGod.pluginConfig.BooleanProperty;
-		ImGui.Text($"The random config bool is {getBooleanProperty}");
+		var contextActive = IAmGod.pluginConfiguration.gameInteractionContextMenu;
+		ImGui.Text("Context menu interaction is " + (contextActive ? "enabled" : "disabled"));
 
 		if (ImGui.Button("Show Settings"))
 		{
