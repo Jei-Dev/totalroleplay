@@ -6,6 +6,7 @@ using Dalamud.Logging;
 using Dalamud.Plugin;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using totalRoleplay.Handlers;
 using totalRoleplay.Model;
@@ -17,8 +18,9 @@ public class QuestService : IServiceType
 {
 	public Dictionary<string, Quest> Quests { get; init; }
 	public List<ActiveQuest> ActiveQuests { get; } = new List<ActiveQuest>();
+	private Dictionary<string, bool> CompletedQuests { get; init; } = new Dictionary<string, bool>();
 
-	public Dictionary<string, DialogueSequence> Dialogues { get; init; }
+	private Dictionary<string, DialogueSequence> Dialogues { get; init; }
 
 	public delegate void OnQuestComplete(string questId);
 	public event OnQuestComplete? QuestComplete;
@@ -39,6 +41,16 @@ public class QuestService : IServiceType
 		this.dialogueHandler = dialogueHandler;
 	}
 
+	private IEnumerable<(string, QuestStateTrigger)> ActiveQuestTriggers =>
+		Quests
+		.Where(quest => !CompletedQuests.ContainsKey(quest.Key))
+		.SelectMany(quest =>
+		{
+			var activeQuest = ActiveQuests.Find(aq => aq.QuestId == quest.Key);
+			QuestStateTrigger[] triggers = activeQuest == null ? quest.Value.StartTriggers : quest.Value.States[activeQuest.CurrentState].Triggers;
+			return triggers.Select(trigger => (quest.Key, trigger));
+		});
+
 	public void BeginQuest(string questId)
 	{
 		ActiveQuests.Add(new ActiveQuest
@@ -53,43 +65,33 @@ public class QuestService : IServiceType
 
 	public void TriggerCommand(string cmd)
 	{
-		foreach (var aq in ActiveQuests)
+		foreach (var (questId, trigger) in ActiveQuestTriggers)
 		{
-			var quest = Quests[aq.QuestId];
-			var state = quest.States[aq.CurrentState];
-			foreach (var trigger in state.Triggers)
+			if (trigger.When.Command == cmd)
 			{
-				if (trigger.When.Command == cmd)
-				{
-					ExecuteTriggerActions(aq.QuestId, trigger.Then);
-				}
+				ExecuteTriggerActions(questId, trigger.Then);
 			}
 		}
 	}
 
 	private (string, QuestStateTriggerAction)? GetInteractionTriggerForTarget(GameObject target)
 	{
-		foreach (var activeQuest in ActiveQuests)
+		foreach (var (questId, trigger) in ActiveQuestTriggers)
 		{
-			var quest = Quests[activeQuest.QuestId];
-			var state = quest.States[activeQuest.CurrentState];
-			foreach (var trigger in state.Triggers)
+			var targetCond = trigger.When.InteractWithObject;
+			if (targetCond?.DataId != null && targetCond.DataId == target.DataId)
 			{
-				var targetCond = trigger.When.InteractWithObject;
-				if (targetCond?.DataId != null && targetCond.DataId == target.DataId)
-				{
-					return (activeQuest.QuestId, trigger.Then);
-				}
-				if (targetCond?.Player != null && target is PlayerCharacter player)
-				{
+				return (questId, trigger.Then);
+			}
+			if (targetCond?.Player != null && target is PlayerCharacter player)
+			{
 
-					if (
-						player.Name.ToString() == targetCond.Player.CharacterName &&
-						player.HomeWorld.GameData?.Name.ToString() == targetCond.Player.World
-					)
-					{
-						return (activeQuest.QuestId, trigger.Then);
-					}
+				if (
+					player.Name.ToString() == targetCond.Player.CharacterName &&
+					player.HomeWorld.GameData?.Name.ToString() == targetCond.Player.World
+				)
+				{
+					return (questId, trigger.Then);
 				}
 			}
 		}
@@ -127,6 +129,10 @@ public class QuestService : IServiceType
 				questActionTriggerHandler: action => ExecuteTriggerActions(questId, action)
 			);
 		}
+		if (action.BeginQuest)
+		{
+			BeginQuest(questId);
+		}
 		if (action.FinishQuest)
 		{
 			if (QuestComplete != null)
@@ -134,6 +140,7 @@ public class QuestService : IServiceType
 				QuestComplete(questId);
 			}
 			ActiveQuests.RemoveAll(aq => aq.QuestId == questId);
+			CompletedQuests[questId] = true;
 		}
 	}
 }

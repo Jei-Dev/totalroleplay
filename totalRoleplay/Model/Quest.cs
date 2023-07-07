@@ -1,5 +1,6 @@
 namespace totalRoleplay.Model;
 
+using System;
 using System.Collections.Generic;
 
 public record Quest
@@ -8,6 +9,7 @@ public record Quest
 	public required string Description { get; init; }
 	public required string InitialState { get; init; }
 	public required Dictionary<string, QuestState> States { get; init; }
+	public QuestStateTrigger[] StartTriggers { get; init; } = Array.Empty<QuestStateTrigger>();
 }
 
 public record QuestState
@@ -43,5 +45,6 @@ public record QuestStateTriggerAction
 {
 	public string? GoToState { get; init; }
 	public string? BeginDialogueSequence { get; init; }
+	public bool BeginQuest { get; init; }
 	public bool FinishQuest { get; init; }
 }

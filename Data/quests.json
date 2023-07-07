@@ -1,66 +1,111 @@
 {
-    "quests": {
-        "q1": {
-            "title": "foo",
-            "description": "foooooo",
-            "initialState": "start",
-            "states": {
-                "start": {
-                    "triggers": [{
-                        "when": {
-                            "command": "fooo"
-                        },
-                        "then": {
-                            "finishQuest": true
-                        }
-                    }, {
-                        "when": {
-                            "interactWithObject": {
-                                "dataId": 1011080
-                            }
-                        },
-                        "then": {
-                            "beginDialogueSequence": "talkToAttendant"
-                        }
-                    }, {
-                        "when": {
-                            "interactWithObject": {
-                                "player": {
-                                    "characterName": "Zelda Wynters",
-                                    "world": "Omega"
-                                }
-                            }
-                        },
-                        "then": {
-                            "beginDialogueSequence": "talkToAttendant"
-                        }
-                    }]
-                }
-            }
-        }
-    },
-    "dialogues": {
-        "talkToAttendant": {
-            "lines": [{
-                "actorName": "Zelda Wynters",
-                "content": "Well, this was a bust"
-            }, {
-                "actorName": "GATE Attendant",
-                "content": "Excuse me, this is a Wendy's"
-            }, {
-                "actorName": "{YOU}",
-                "content": "Will you two just calm down for a moment?",
-                "triggers": [{
-                    "when": {
-                        "closed": true
-                    },
-                    "then": {
-                        "quest": {
-                            "finishQuest": true
-                        }
-                    }
-                }]
-            }]
-        }
-    }
+	"quests": {
+		"q1": {
+			"title": "foo",
+			"description": "foooooo",
+			"initialState": "start",
+			"states": {
+				"start": {
+					"triggers": [
+						{
+							"when": {
+								"command": "fooo"
+							},
+							"then": {
+								"finishQuest": true
+							}
+						},
+						{
+							"when": {
+								"interactWithObject": {
+									"dataId": 1011080
+								}
+							},
+							"then": {
+								"beginDialogueSequence": "talkToAttendant"
+							}
+						},
+						{
+							"when": {
+								"interactWithObject": {
+									"player": {
+										"characterName": "Zelda Wynters",
+										"world": "Omega"
+									}
+								}
+							},
+							"then": {
+								"beginDialogueSequence": "talkToAttendant"
+							}
+						}
+					]
+				}
+			},
+			"startTriggers": [
+				{
+					"when": {
+						"interactWithObject": {
+							"player": {
+								"characterName": "Zelda Wynters",
+								"world": "Omega"
+							}
+						}
+					},
+					"then": {
+						"beginDialogueSequence": "beginQ1"
+					}
+				}
+			]
+		}
+	},
+	"dialogues": {
+		"beginQ1": {
+			"lines": [
+				{
+					"actorName": "Zelda Wynters",
+					"content": "Heyyy u wan sum cash?",
+					"triggers": [
+						{
+							"when": {
+								"closed": true
+							},
+							"then": {
+								"quest": {
+									"beginQuest": true
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		"talkToAttendant": {
+			"lines": [
+				{
+					"actorName": "Zelda Wynters",
+					"content": "Well, this was a bust"
+				},
+				{
+					"actorName": "GATE Attendant",
+					"content": "Excuse me, this is a Wendy's"
+				},
+				{
+					"actorName": "{YOU}",
+					"content": "Will you two just calm down for a moment?",
+					"triggers": [
+						{
+							"when": {
+								"closed": true
+							},
+							"then": {
+								"quest": {
+									"finishQuest": true
+								}
+							}
+						}
+					]
+				}
+			]
+		}
+	}
 }
