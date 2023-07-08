@@ -24,7 +24,7 @@ namespace totalRoleplay
 		public DalamudContextMenu dalamudContextMenu { get; init; }
 		public WindowSystem WindowSystem = new("totalRoleplay");
 		public ConfigWindow ConfigWindow { get; init; }
-		public FakeDialogueHandler fakeDialogueHandler { get; init; }
+		public DialogueService dialogueService { get; init; }
 		public GameInteractionHandler gameInteractionHandler { get; init; }
 		public CommandHandler commandHandler { get; init; }
 
@@ -41,8 +41,8 @@ namespace totalRoleplay
 
 			var pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 			pluginConfiguration.Initialize(pluginInterface);
-			fakeDialogueHandler = new FakeDialogueHandler();
-			var questService = new QuestService(pluginInterface, fakeDialogueHandler);
+			dialogueService = new DialogueService();
+			var questService = new QuestService(pluginInterface, dialogueService);
 			dalamudContextMenu = new DalamudContextMenu();
 			gameInteractionHandler = new GameInteractionHandler(pluginConfiguration, dalamudContextMenu, dalamud.objectTable, questService);
 
@@ -50,7 +50,7 @@ namespace totalRoleplay
 			TRPWindowMain = new MainWindow(this, pluginConfiguration);
 			QuestListWindow = new QuestListWindow(this, pluginConfiguration, questService, dalamud.toastGui);
 			currencyWindow = new currencyWindow();
-			fakeDialogueWindow = new FakeDialogueWindow(fakeDialogueHandler, dalamud.keyState, dalamud.clientState, dalamud.targetManager, pluginConfiguration, pluginInterface);
+			fakeDialogueWindow = new FakeDialogueWindow(dialogueService, dalamud.keyState, dalamud.clientState, dalamud.targetManager, pluginConfiguration, pluginInterface);
 			dialogueTriggerWindow = new DialogueTriggerWindow(dalamud.targetManager, questService);
 
 			WindowSystem.AddWindow(ConfigWindow);

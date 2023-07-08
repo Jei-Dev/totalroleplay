@@ -20,7 +20,7 @@ namespace totalRoleplay.Windows;
 public class FakeDialogueWindow : Window, IDisposable
 {
 	private readonly ImGuiScene.TextureWrap backgroundTexture;
-	private readonly FakeDialogueHandler dialogueHandler;
+	private readonly DialogueService dialogueService;
 	private readonly KeyState keyState;
 	private readonly PluginConfiguration configuration;
 	public readonly Stopwatch sw = new();
@@ -28,9 +28,9 @@ public class FakeDialogueWindow : Window, IDisposable
 	private readonly ClientState clientState;
 	private readonly TargetManager targetManager;
 
-	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState, TargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
+	public FakeDialogueWindow(DialogueService dialogueService, KeyState keyState, ClientState clientState, TargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
 	{
-		this.dialogueHandler = dialogueHandler;
+		this.dialogueService = dialogueService;
 		this.keyState = keyState;
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
 
@@ -42,21 +42,21 @@ public class FakeDialogueWindow : Window, IDisposable
 		this.clientState = clientState;
 		this.targetManager = targetManager;
 
-		dialogueHandler.OnStartDialogue += OnStartDialogue;
-		dialogueHandler.OnEndDialogue += OnEndDialogue;
+		dialogueService.OnStartDialogue += OnStartDialogue;
+		dialogueService.OnEndDialogue += OnEndDialogue;
 	}
 
 	public void Dispose()
 	{
 		backgroundTexture.Dispose();
 		sw.Reset();
-		dialogueHandler.OnStartDialogue -= OnStartDialogue;
-		dialogueHandler.OnEndDialogue -= OnEndDialogue;
+		dialogueService.OnStartDialogue -= OnStartDialogue;
+		dialogueService.OnEndDialogue -= OnEndDialogue;
 	}
 
 	public override void Draw()
 	{
-		var currentLine = dialogueHandler.CurrentDialogueLine;
+		var currentLine = dialogueService.CurrentDialogueLine;
 		ImGui.Image(backgroundTexture.ImGuiHandle, new Vector2(backgroundTexture.Width, backgroundTexture.Height));
 		ImGui.SetCursorPos(new Vector2(55, 30));
 		ImGui.Text(currentLine?.ActorName
@@ -76,7 +76,7 @@ public class FakeDialogueWindow : Window, IDisposable
 		if (space && !prevSpace)
 		{
 			sw.Restart();
-			dialogueHandler.proceedToNextPage();
+			dialogueService.proceedToNextPage();
 		}
 		prevSpace = space;
 	}

@@ -13,8 +13,7 @@ using totalRoleplay.Model;
 
 namespace totalRoleplay.Service;
 
-[PluginInterface]
-public class QuestService : IServiceType
+public class QuestService
 {
 	public Dictionary<string, Quest> Quests { get; init; }
 	public List<ActiveQuest> ActiveQuests { get; } = new List<ActiveQuest>();
@@ -25,9 +24,9 @@ public class QuestService : IServiceType
 	public delegate void OnQuestComplete(string questId);
 	public event OnQuestComplete? QuestComplete;
 
-	private readonly FakeDialogueHandler dialogueHandler;
+	private readonly DialogueService dialogueService;
 
-	public QuestService(DalamudPluginInterface pluginInterface, FakeDialogueHandler dialogueHandler)
+	public QuestService(DalamudPluginInterface pluginInterface, DialogueService dialogueService)
 	{
 		var questJsonPath = Path.Join(pluginInterface.AssemblyLocation.Directory!.FullName, "quests.json");
 		PluginLog.LogInformation(questJsonPath);
@@ -38,7 +37,7 @@ public class QuestService : IServiceType
 		)!;
 		Quests = story.Quests;
 		Dialogues = story.Dialogues;
-		this.dialogueHandler = dialogueHandler;
+		this.dialogueService = dialogueService;
 	}
 
 	private IEnumerable<(string, QuestStateTrigger)> ActiveQuestTriggers =>
@@ -124,7 +123,7 @@ public class QuestService : IServiceType
 		}
 		if (action.BeginDialogueSequence != null)
 		{
-			dialogueHandler.startFakeDialogue(
+			dialogueService.startFakeDialogue(
 				Dialogues[action.BeginDialogueSequence],
 				questActionTriggerHandler: action => ExecuteTriggerActions(questId, action)
 			);

@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using totalRoleplay.Model;
 
-namespace totalRoleplay.Handlers;
+namespace totalRoleplay.Service;
 
-public class FakeDialogueHandler
+public class DialogueService
 {
     public delegate void OnStartDialogueHandler();
     public event OnStartDialogueHandler? OnStartDialogue;
