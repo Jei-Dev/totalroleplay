@@ -1,9 +1,9 @@
 using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
 using ImGuiNET;
 using System;
 using System.Numerics;
+using totalRoleplay.Configuration;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
@@ -11,27 +11,33 @@ namespace totalRoleplay.Windows;
 public class QuestListWindow : Window, IDisposable
 {
 	private string? selectedQuest;
+	private readonly PluginConfiguration configuration;
+	private readonly QuestService questService;
+	private readonly ToastGui toastGui;
 
-	public QuestListWindow(Plugin plugin) : base("TRP - Quests", 0)
+	public QuestListWindow(Plugin plugin,  PluginConfiguration configuration, QuestService questService, ToastGui toastGui) : base("TRP - Quests", 0)
 	{
 		this.Size = new Vector2(200, 200);
 		this.SizeCondition = ImGuiCond.Once;
-		IAmGod.questService.QuestComplete += QuestCompleted;
+		this.configuration = configuration;
+		this.questService = questService;
+		this.toastGui = toastGui;
+		questService.QuestComplete += QuestCompleted;
 	}
 
 	public void Dispose()
 	{
-		IAmGod.questService.QuestComplete -= QuestCompleted;
+		questService.QuestComplete -= QuestCompleted;
 	}
 
 	public override void Draw()
 	{
 		ImGui.Text("Quests");
-		if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * IAmGod.questService.ActiveQuests.Count * 2 + ImGui.GetStyle().FramePadding.Y)))
+		if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * questService.ActiveQuests.Count * 2 + ImGui.GetStyle().FramePadding.Y)))
 		{
-			foreach (var activeQuest in IAmGod.questService.ActiveQuests)
+			foreach (var activeQuest in questService.ActiveQuests)
 			{
-				var quest = IAmGod.questService.Quests[activeQuest.QuestId];
+				var quest = questService.Quests[activeQuest.QuestId];
 				if (ImGui.Selectable(quest.Title, activeQuest.QuestId == selectedQuest))
 				{
 					selectedQuest = activeQuest.QuestId;
@@ -47,12 +53,12 @@ public class QuestListWindow : Window, IDisposable
 
 		if (selectedQuest != null)
 		{
-			ImGui.Text(IAmGod.questService.Quests[selectedQuest].Description);
+			ImGui.Text(questService.Quests[selectedQuest].Description);
 		}
 	}
 	public void IncrementCurrentQuestGoal()
 	{
-		IAmGod.questService.ActiveQuests
+		questService.ActiveQuests
 			.FindAll(aq => aq.QuestId == selectedQuest)
 			.ForEach(aq => aq.GoalCurrent++);
 	}
@@ -61,11 +67,10 @@ public class QuestListWindow : Window, IDisposable
 	/// </summary>
 	public void showQuestToast(Boolean complete)
 	{
-		var canShow = IAmGod.pluginConfiguration.showTextNotify;
-		if (canShow)
+		if (configuration.showTextNotify)
 		{
-			var questName = IAmGod.questService.Quests[selectedQuest!].Title;
-			IAmGod.toastGui?.ShowQuest($"{questName}", new QuestToastOptions
+			var questName = questService.Quests[selectedQuest!].Title;
+			toastGui.ShowQuest($"{questName}", new QuestToastOptions
 			{
 				Position = QuestToastPosition.Centre,
 				DisplayCheckmark = complete,
@@ -77,8 +82,8 @@ public class QuestListWindow : Window, IDisposable
 
 	private void QuestCompleted(string questId)
 	{
-		var questName = IAmGod.questService.Quests[questId].Title;
-		IAmGod.toastGui?.ShowQuest($"{questName}", new QuestToastOptions
+		var questName = questService.Quests[questId].Title;
+		toastGui.ShowQuest($"{questName}", new QuestToastOptions
 		{
 			Position = QuestToastPosition.Centre,
 			DisplayCheckmark = true,

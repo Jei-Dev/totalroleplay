@@ -18,7 +18,7 @@ public class PluginConfiguration : IPluginConfiguration
 
 	// the below exist just to make saving less cumbersome
 	[NonSerialized]
-	private DalamudPluginInterface pluginInterface;
+	private DalamudPluginInterface? pluginInterface;
 
 	public void Initialize(DalamudPluginInterface pluginInterface)
 	{
@@ -30,7 +30,7 @@ public class PluginConfiguration : IPluginConfiguration
 
 	public void Save()
 	{
-		pluginInterface.SavePluginConfig(this);
+		pluginInterface!.SavePluginConfig(this);
 		PluginLog.Debug("Saved Configuration");
 	}
 }

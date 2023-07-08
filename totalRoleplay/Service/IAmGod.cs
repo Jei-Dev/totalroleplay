@@ -14,47 +14,41 @@ namespace totalRoleplay.Service
 {
 	internal class IAmGod
 	{
-		public static Plugin plugin;
-
-		public static PluginConfiguration pluginConfiguration;
-
-		public static QuestService questService;
+		[PluginService]
+		public DalamudPluginInterface pluginInterface { get; private set; } = null!;
 
 		[PluginService]
-		public static DalamudPluginInterface pluginInterface { get; private set; } = null!;
-
-		[PluginService]
-		public static CommandManager commandManager { get; private set; } = null!;
+		public CommandManager commandManager { get; private set; } = null!;
 
 		//        [PluginService]
-		//        public static FlyTextGui flyTextGui { get; private set; } = null!;
+		//        public FlyTextGui flyTextGui { get; private set; } = null!;
 
 		[PluginService]
-		public static ToastGui toastGui { get; private set; } = null!;
+		public ToastGui toastGui { get; private set; } = null!;
 
 		[PluginService]
-		public static ClientState clientState { get; private set; } = null!;
+		public ClientState clientState { get; private set; } = null!;
 
 		[PluginService]
-		public static ChatGui chatGui { get; private set; } = null!;
+		public ChatGui chatGui { get; private set; } = null!;
 
 		[PluginService]
-		public static SigScanner sigScanner { get; private set; } = null!;
+		public SigScanner sigScanner { get; private set; } = null!;
 
 		[PluginService]
-		public static ObjectTable objectTable { get; private set; } = null!;
+		public ObjectTable objectTable { get; private set; } = null!;
 
 		[PluginService]
-		public static Framework framework { get; private set; } = null!;
+		public Framework framework { get; private set; } = null!;
 
 		[PluginService]
-		public static GameGui gameGui { get; private set; } = null!;
+		public GameGui gameGui { get; private set; } = null!;
 
 		[PluginService]
-		public static KeyState keyState { get; private set; } = null!;
+		public KeyState keyState { get; private set; } = null!;
 
 		[PluginService]
-		public static TargetManager targetManager { get; private set; } = null!;
+		public TargetManager targetManager { get; private set; } = null!;
 
 	}
 }

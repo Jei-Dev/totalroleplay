@@ -39,7 +39,7 @@ public class GameInteractionHandler : IDisposable
 	public void AddContextMenu(GameObjectContextMenuOpenArgs args)
 	{
 		var gameObject = objectTable.SearchById(args.ObjectId);
-		if (!gameObject) return;
+		if (gameObject == null) return;
 
 		if (questService.CanInteractWithTarget(gameObject))
 		{

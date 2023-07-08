@@ -9,7 +9,7 @@ using totalRoleplay.Windows;
 
 namespace totalRoleplay.Handlers;
 
-public static class CommandHandler
+public class CommandHandler : IDisposable
 {
 	private record Commands
 	{
@@ -17,7 +17,7 @@ public static class CommandHandler
 		public string? HelpMessage { get; init; }
 	};
 
-	private static readonly Commands[] ACommands = {
+	private readonly Commands[] ACommands = {
 		new Commands { CommandName = "trp", HelpMessage = "Opens the Total Roleplay menu."},
 		new Commands { CommandName = "trpq", HelpMessage = null},
 		new Commands { CommandName = "trpqa", HelpMessage = null},
@@ -27,54 +27,56 @@ public static class CommandHandler
 		new Commands { CommandName = "trpfakeDialogue", HelpMessage = "Opens the Fake Dialogue Window"}
 	};
 
-	/// <summary>
-	/// Call to Load all Commands currently set in ReadOnly table "Commands".
-	/// </summary>
-	public static void Load()
+	private readonly Plugin plugin;
+	private readonly CommandManager commandManager;
+	private readonly QuestService questService;
+
+	public CommandHandler(Plugin plugin, CommandManager commandManager, QuestService questService)
 	{
+		this.plugin = plugin;
+		this.commandManager = commandManager;
+		this.questService = questService;
+
 		for (int i = 0; i < ACommands.Length; i++)
 		{
-			IAmGod.commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandsHandler) { HelpMessage = ACommands[i].HelpMessage ?? "N/A" });
+			commandManager.AddHandler("/" + ACommands[i].CommandName, new CommandInfo(CommandsHandler) { HelpMessage = ACommands[i].HelpMessage ?? "N/A" });
 			PluginLog.LogDebug("CommandManager: Loaded /" + ACommands[i].CommandName);
 		}
 	}
 
-	/// <summary>
-	/// Call to UnLoad all Commands currently Loaded. ONLY call in Dispose()
-	/// </summary>
-	public static void UnLoad()
+	public void Dispose()
 	{
 		for (int i = 0; i < ACommands.Length; i++)
 		{
-			IAmGod.commandManager.RemoveHandler("/" + ACommands[i].CommandName);
+			commandManager.RemoveHandler("/" + ACommands[i].CommandName);
 			PluginLog.LogDebug("CommandManager: Destroyed /" + ACommands[i].CommandName);
 		}
 	}
 
-	public static void CommandsHandler(string command, string arguments)
+	public void CommandsHandler(string command, string arguments)
 	{
 		switch (command)
 		{
 			case "/trp":
-				IAmGod.plugin.TRPWindowMain.IsOpen = !IAmGod.plugin.TRPWindowMain.IsOpen;
+				plugin.TRPWindowMain.Toggle();
 				break;
 			case "/trpq":
-				IAmGod.plugin.QuestListWindow.IsOpen = true;
+				plugin.QuestListWindow.Toggle();
 				break;
 			case "/trpqa":
-				IAmGod.plugin.QuestListWindow.IncrementCurrentQuestGoal();
+				plugin.QuestListWindow.IncrementCurrentQuestGoal();
 				break;
 			case "/trpqb":
-				IAmGod.questService.BeginQuest(arguments);
+				questService.BeginQuest(arguments);
 				break;
 			case "/trpqt":
-				IAmGod.questService.TriggerCommand(arguments);
+				questService.TriggerCommand(arguments);
 				break;
 			case "/trpcurrency":
-				IAmGod.plugin.currencyWindow.IsOpen = !IAmGod.plugin.currencyWindow.IsOpen;
+				plugin.currencyWindow.Toggle();
 				break;
 			case "/trpfakeDialogue":
-				var fakeDialogueWin = IAmGod.plugin.fakeDialogueWindow;
+				var fakeDialogueWin = plugin.fakeDialogueWindow;
 				var fakeDialogueTimer = fakeDialogueWin.sw.IsRunning;
 				fakeDialogueWin.IsOpen = !fakeDialogueWin.IsOpen;
 				if (!fakeDialogueWin.IsOpen)

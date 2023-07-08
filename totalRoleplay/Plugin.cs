@@ -2,6 +2,7 @@ using Dalamud.ContextMenu;
 using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using totalRoleplay.Configuration;
 using totalRoleplay.Handlers;
@@ -14,39 +15,37 @@ namespace totalRoleplay
 	{
 		public string Name => "Roleplay Totality";
 
-		private DalamudPluginInterface PluginInterface { get; init; }
-		public PluginConfiguration pluginConfiguration { get; init; }
 		public DalamudContextMenu dalamudContextMenu { get; init; }
 		public WindowSystem WindowSystem = new("totalRoleplay");
 		public ConfigWindow ConfigWindow { get; init; }
+		public FakeDialogueHandler fakeDialogueHandler { get; init; }
+		public GameInteractionHandler gameInteractionHandler { get; init; }
+		public CommandHandler commandHandler { get; init; }
+
 		public MainWindow TRPWindowMain { get; init; }
 		public QuestListWindow QuestListWindow { get; init; }
 		public currencyWindow currencyWindow { get; init; }
 		public FakeDialogueWindow fakeDialogueWindow { get; init; }
-		public FakeDialogueHandler fakeDialogueHandler { get; init; }
 		public DialogueTriggerWindow dialogueTriggerWindow { get; init; }
-		public GameInteractionHandler gameInteractionHandler { get; init; }
 
 		public Plugin(DalamudPluginInterface pluginInterface)
 		{
+			var god = new IAmGod();
+			pluginInterface.Inject(god);
 
-			pluginInterface.Create<IAmGod>();
-
-			IAmGod.plugin = this;
-			IAmGod.pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
-			IAmGod.pluginConfiguration.Initialize(pluginInterface);
+			var pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
+			pluginConfiguration.Initialize(pluginInterface);
 			fakeDialogueHandler = new FakeDialogueHandler();
-			IAmGod.questService = new QuestService(pluginInterface, fakeDialogueHandler);
+			var questService = new QuestService(pluginInterface, fakeDialogueHandler);
 			dalamudContextMenu = new DalamudContextMenu();
-			gameInteractionHandler = new GameInteractionHandler(IAmGod.pluginConfiguration, dalamudContextMenu, IAmGod.objectTable, IAmGod.questService);
+			gameInteractionHandler = new GameInteractionHandler(pluginConfiguration, dalamudContextMenu, god.objectTable, questService);
 
-
-			ConfigWindow = new ConfigWindow();
-			TRPWindowMain = new MainWindow();
-			QuestListWindow = new QuestListWindow(this);
+			ConfigWindow = new ConfigWindow(pluginConfiguration);
+			TRPWindowMain = new MainWindow(this, pluginConfiguration);
+			QuestListWindow = new QuestListWindow(this, pluginConfiguration, questService, god.toastGui);
 			currencyWindow = new currencyWindow();
-			fakeDialogueWindow = new FakeDialogueWindow(fakeDialogueHandler, IAmGod.keyState, IAmGod.clientState, IAmGod.targetManager);
-			dialogueTriggerWindow = new DialogueTriggerWindow(IAmGod.targetManager, IAmGod.questService);
+			fakeDialogueWindow = new FakeDialogueWindow(fakeDialogueHandler, god.keyState, god.clientState, god.targetManager, pluginConfiguration, pluginInterface);
+			dialogueTriggerWindow = new DialogueTriggerWindow(god.targetManager, questService);
 
 			WindowSystem.AddWindow(ConfigWindow);
 			WindowSystem.AddWindow(TRPWindowMain);
@@ -55,23 +54,14 @@ namespace totalRoleplay
 			WindowSystem.AddWindow(fakeDialogueWindow);
 			WindowSystem.AddWindow(dialogueTriggerWindow);
 
-			CommandHandler.Load();
-			/*
-			 * We don't need to keep this, however its here for Histories sake. (Remove when cleaning code for production)
-			IAmGod.commandManager.AddHandler("/trp", new CommandInfo(OnCommand) { HelpMessage = "Opens the Total Roleplay window." });
-			IAmGod.commandManager.AddHandler("/trpq", new CommandInfo(OnCommand));
-			IAmGod.commandManager.AddHandler("/trpqa", new CommandInfo(OnCommand));
-			IAmGod.commandManager.AddHandler("/trpqb", new CommandInfo(OnCommand));
-			IAmGod.commandManager.AddHandler("/trpqt", new CommandInfo(OnCommand));
-			IAmGod.commandManager.AddHandler("/trpcurrency", new CommandInfo(OnCommand) { HelpMessage = "Shows Total Roleplay's Currency Window." });
-			*/
+			commandHandler = new CommandHandler(this, god.commandManager, questService);
 			pluginInterface.UiBuilder.Draw += DrawUI;
 			pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 		}
 
 		public void Dispose()
 		{
-			CommandHandler.UnLoad();
+			commandHandler.Dispose();
 			this.WindowSystem.RemoveAllWindows();
 			dalamudContextMenu.Dispose();
 
@@ -82,42 +72,7 @@ namespace totalRoleplay
 			fakeDialogueWindow.Dispose();
 			dialogueTriggerWindow.Dispose();
 
-			/*
-			IAmGod.commandManager.RemoveHandler("/trp");
-			IAmGod.commandManager.RemoveHandler("/trpq");
-			IAmGod.commandManager.RemoveHandler("/trpqa");
-			IAmGod.commandManager.RemoveHandler("/trpqb");
-			IAmGod.commandManager.RemoveHandler("/trpqt");
-			IAmGod.commandManager.RemoveHandler("/trpcurrency");
-			*/
 		}
-		/*
-		private void OnCommand(string command, string args)
-		{
-			// in response to the slash command, just display our main ui
-			switch (command)
-			{
-				case "/trp":
-					TRPWindowMain.IsOpen = !TRPWindowMain.IsOpen;
-					break;
-				case "/trpq":
-					QuestListWindow.IsOpen = true;
-					break;
-				case "/trpqa":
-					QuestListWindow.IncrementCurrentQuestGoal();
-					break;
-				case "/trpqb":
-					IAmGod.questService.BeginQuest(args);
-					break;
-				case "/trpqt":
-					IAmGod.questService.TriggerCommand(args);
-					break;
-				case "/trpcurrency":
-					currencyWindow.IsOpen = !currencyWindow.IsOpen;
-					break;
-			}
-		}
-		*/
 
 		private void DrawUI()
 		{

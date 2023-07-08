@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
+using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using ImGuiNET;
 using System;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Timers;
+using totalRoleplay.Configuration;
 using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 
@@ -20,22 +22,23 @@ public class FakeDialogueWindow : Window, IDisposable
 	private readonly ImGuiScene.TextureWrap backgroundTexture;
 	private readonly FakeDialogueHandler dialogueHandler;
 	private readonly KeyState keyState;
-	private readonly float textSpeed = IAmGod.pluginConfiguration.dialogueDrawSpeed;
+	private readonly PluginConfiguration configuration;
 	public readonly Stopwatch sw = new();
 	private bool prevSpace = false;
 	private readonly ClientState clientState;
 	private readonly TargetManager targetManager;
 
-	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState, TargetManager targetManager) : base("Fake Dialogue Window")
+	public FakeDialogueWindow(FakeDialogueHandler dialogueHandler, KeyState keyState, ClientState clientState, TargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
 	{
 		this.dialogueHandler = dialogueHandler;
 		this.keyState = keyState;
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
 
-		var imagePath = Path.Combine(IAmGod.pluginInterface.AssemblyLocation.Directory?.FullName!, "FFXIVEmptyDialogueBox.png");
-		backgroundTexture = IAmGod.pluginInterface.UiBuilder.LoadImage(imagePath);
+		var imagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "FFXIVEmptyDialogueBox.png");
+		backgroundTexture = pluginInterface.UiBuilder.LoadImage(imagePath);
 		Size = new Vector2(backgroundTexture.Width, backgroundTexture.Height);
 
+		this.configuration = configuration;
 		this.clientState = clientState;
 		this.targetManager = targetManager;
 
@@ -61,7 +64,7 @@ public class FakeDialogueWindow : Window, IDisposable
 				   .Replace("{TARGET}", targetManager.Target?.Name.ToString())
 				   ?? "No Name");
 		ImGui.SetCursorPos(new Vector2(45, 70));
-		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * textSpeed, 0, currentLine?.Content?.Length ?? 0);
+		var displayedCharacters = Math.Clamp(sw.Elapsed.TotalMilliseconds * configuration.dialogueDrawSpeed, 0, currentLine?.Content?.Length ?? 0);
 		ImGui.TextColored(new Vector4(0, 0, 0, 255),
 						  currentLine?.Content?[..(int)displayedCharacters] ?? "");
 		ImGui.GetIO().WantTextInput = true;
