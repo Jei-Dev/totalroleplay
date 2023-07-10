@@ -2,17 +2,13 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
 using Dalamud.Plugin;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using System.Timers;
 using totalRoleplay.Configuration;
-using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;

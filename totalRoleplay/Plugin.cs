@@ -8,12 +8,12 @@ using Dalamud.Game.Gui;
 using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
 using totalRoleplay.Configuration;
 using totalRoleplay.Handlers;
 using totalRoleplay.Service;
 using totalRoleplay.Windows;
+using totalRoleplay.Windows.charactersheet;
 
 namespace totalRoleplay
 {
@@ -27,13 +27,14 @@ namespace totalRoleplay
 		public DialogueService dialogueService { get; init; }
 		public GameInteractionHandler gameInteractionHandler { get; init; }
 		public CommandHandler commandHandler { get; init; }
+		public CharacterConfiguration characterConfiguration { get; init; }
 
 		public MainWindow TRPWindowMain { get; init; }
 		public QuestListWindow QuestListWindow { get; init; }
 		public currencyWindow currencyWindow { get; init; }
 		public FakeDialogueWindow fakeDialogueWindow { get; init; }
 		public DialogueTriggerWindow dialogueTriggerWindow { get; init; }
-
+		public CharacterSheetWindow characterSheetWindow { get; init; }
 		public Plugin(DalamudPluginInterface pluginInterface)
 		{
 			var dalamud = new DalamudServices();
@@ -41,6 +42,7 @@ namespace totalRoleplay
 
 			var pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 			pluginConfiguration.Initialize(pluginInterface);
+			characterConfiguration = new CharacterConfiguration();
 			dialogueService = new DialogueService();
 			var questService = new QuestService(pluginInterface, dialogueService);
 			dalamudContextMenu = new DalamudContextMenu();
@@ -52,6 +54,7 @@ namespace totalRoleplay
 			currencyWindow = new currencyWindow();
 			fakeDialogueWindow = new FakeDialogueWindow(dialogueService, dalamud.keyState, dalamud.clientState, dalamud.targetManager, pluginConfiguration, pluginInterface);
 			dialogueTriggerWindow = new DialogueTriggerWindow(dalamud.targetManager, questService);
+			characterSheetWindow = new CharacterSheetWindow(characterConfiguration);
 
 			WindowSystem.AddWindow(ConfigWindow);
 			WindowSystem.AddWindow(TRPWindowMain);
@@ -59,6 +62,7 @@ namespace totalRoleplay
 			WindowSystem.AddWindow(currencyWindow);
 			WindowSystem.AddWindow(fakeDialogueWindow);
 			WindowSystem.AddWindow(dialogueTriggerWindow);
+			WindowSystem.AddWindow(characterSheetWindow);
 
 			commandHandler = new CommandHandler(this, dalamud.commandManager, questService);
 			pluginInterface.UiBuilder.Draw += DrawUI;
