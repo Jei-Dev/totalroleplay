@@ -76,10 +76,10 @@ public class ICommandHandler : IDisposable
 			case "/trpqt":
 				questService.TriggerCommand(arguments);
 				break;
-			case "/trpcurrency":
+			case "/trpc":
 				plugin.currencyWindow.Toggle();
 				break;
-			case "/trpfakedialogue":
+			case "/trpfd":
 				var fakeDialogueWin = plugin.fakeDialogueWindow;
 				var fakeDialogueTimer = fakeDialogueWin.sw.IsRunning;
 				fakeDialogueWin.IsOpen = !fakeDialogueWin.IsOpen;
@@ -91,7 +91,7 @@ public class ICommandHandler : IDisposable
 				}
 				else { fakeDialogueWin.sw.Start(); log.Debug("Started dialogue timer? " + !fakeDialogueTimer); }
 				break;
-			case "/trpcharsheet":
+			case "/trpcs":
 				plugin.characterSheetWindow.Toggle();
 				break;
 		}
