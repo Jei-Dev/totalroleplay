@@ -1,23 +1,24 @@
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Numerics;
 using totalRoleplay.Configuration;
-using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
 	private readonly PluginConfiguration pluginConfiguration;
+	private readonly IPluginLog log;
 
-	public ConfigWindow(PluginConfiguration pluginConfiguration) : base("Total Roleplay Configuration")
+	public ConfigWindow(PluginConfiguration pluginConfiguration, IPluginLog log) : base("Total Roleplay Configuration")
 	{
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 		this.Size = new Vector2(500, 100);
 		this.SizeCondition = ImGuiCond.Always;
 		this.pluginConfiguration = pluginConfiguration;
+		this.log = log;
 	}
 
 	public void Dispose() { }
@@ -40,7 +41,7 @@ public class ConfigWindow : Window, IDisposable
 		if (ImGui.Button("Save", new Vector2(50, 50)))
 		{
 			pluginConfiguration.Save();
-			PluginLog.Debug("Save button hit");
+			log.Debug("Save button hit");
 		}
 	}
 }

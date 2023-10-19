@@ -1,12 +1,12 @@
 using Dalamud.Game.Command;
-using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Handlers;
 
-public class CommandHandler : IDisposable
+public class ICommandHandler : IDisposable
 {
 	private record Commands
 	{
@@ -20,34 +20,40 @@ public class CommandHandler : IDisposable
 		new Commands { CommandName = "trpqa", HelpMessage = null},
 		new Commands { CommandName = "trpqb", HelpMessage = null},
 		new Commands { CommandName = "trpqt", HelpMessage = null},
-		new Commands { CommandName = "trpcurrency", HelpMessage = "Opens the Currency Window"},
-		new Commands { CommandName = "trpfakeDialogue", HelpMessage = "Opens the Fake Dialogue Window"},
-		new Commands { CommandName = "trpCharSheet", HelpMessage = "Opens the TRP Character Sheet"}
+		new Commands { CommandName = "trpc", HelpMessage = "Opens the Currency Window"},
+		new Commands { CommandName = "trpfd", HelpMessage = "Opens the Fake Dialogue Window"},
+		new Commands { CommandName = "trpcs", HelpMessage = "Opens the TRP Character Sheet"}
 	};
 
 	private readonly Plugin plugin;
-	private readonly CommandManager commandManager;
+	private readonly ICommandHandler commandHandler;
 	private readonly QuestService questService;
+	private readonly ICommandManager commandManager;
+	private readonly IPluginLog log;
 
-	public CommandHandler(Plugin plugin, CommandManager commandManager, QuestService questService)
+	public ICommandHandler(Plugin plugin, ICommandHandler commandHandler, QuestService questService, ICommandManager commandManager, IPluginLog log)
 	{
 		this.plugin = plugin;
-		this.commandManager = commandManager;
+		this.commandHandler = commandHandler;
 		this.questService = questService;
+		this.commandManager = commandManager;
+		this.log = log;
 
-		for (int i = 0; i < aCommands.Length; i++)
+		for (var i = 0; i < aCommands.Length; i++)
 		{
+
+			log.Debug("CommandHandler: Loaded / {0}", aCommands[i].CommandName);
+
 			commandManager.AddHandler("/" + aCommands[i].CommandName, new CommandInfo(CommandsHandler) { HelpMessage = aCommands[i].HelpMessage ?? "N/A" });
-			PluginLog.LogDebug("CommandManager: Loaded /" + aCommands[i].CommandName);
 		}
 	}
 
 	public void Dispose()
 	{
-		for (int i = 0; i < aCommands.Length; i++)
+		for (var i = 0; i < aCommands.Length; i++)
 		{
 			commandManager.RemoveHandler("/" + aCommands[i].CommandName);
-			PluginLog.LogDebug("CommandManager: Destroyed /" + aCommands[i].CommandName);
+			log.Debug("CommandHandler: Destroyed / {0}", aCommands[i].CommandName);
 		}
 	}
 
@@ -80,10 +86,10 @@ public class CommandHandler : IDisposable
 				if (!fakeDialogueWin.IsOpen)
 				{
 					fakeDialogueWin.sw.Reset();
-					PluginLog.LogDebug("Stopped dialogue timer? " + fakeDialogueTimer);
+					log.Debug("Stopped dialogue timer? " + fakeDialogueTimer);
 					ImGui.GetIO().WantTextInput = false;
 				}
-				else { fakeDialogueWin.sw.Start(); PluginLog.LogDebug("Started dialogue timer? " + !fakeDialogueTimer); }
+				else { fakeDialogueWin.sw.Start(); log.Debug("Started dialogue timer? " + !fakeDialogueTimer); }
 				break;
 			case "/trpcharsheet":
 				plugin.characterSheetWindow.Toggle();

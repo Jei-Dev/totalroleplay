@@ -1,14 +1,9 @@
 using Dalamud.ContextMenu;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
-using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using totalRoleplay.Configuration;
 using totalRoleplay.Handlers;
 using totalRoleplay.Service;
@@ -26,7 +21,7 @@ namespace totalRoleplay
 		public ConfigWindow ConfigWindow { get; init; }
 		public DialogueService dialogueService { get; init; }
 		public GameInteractionHandler gameInteractionHandler { get; init; }
-		public CommandHandler commandHandler { get; init; }
+		public ICommandHandler commandHandler { get; init; }
 		public CharacterConfiguration characterConfiguration { get; init; }
 
 		public MainWindow TRPWindowMain { get; init; }
@@ -43,12 +38,12 @@ namespace totalRoleplay
 			var pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 			pluginConfiguration.Initialize(pluginInterface);
 			characterConfiguration = new CharacterConfiguration();
-			dialogueService = new DialogueService();
-			var questService = new QuestService(pluginInterface, dialogueService);
-			dalamudContextMenu = new DalamudContextMenu();
-			gameInteractionHandler = new GameInteractionHandler(pluginConfiguration, dalamudContextMenu, dalamud.objectTable, questService);
+			dialogueService = new DialogueService(dalamud.loggingService);
+			var questService = new QuestService(pluginInterface, dialogueService, dalamud.loggingService);
+			dalamudContextMenu = new DalamudContextMenu(pluginInterface);
+			gameInteractionHandler = new GameInteractionHandler(pluginConfiguration, dalamudContextMenu, dalamud.objectTable, questService, dalamud.loggingService);
 
-			ConfigWindow = new ConfigWindow(pluginConfiguration);
+			ConfigWindow = new ConfigWindow(pluginConfiguration, dalamud.loggingService);
 			TRPWindowMain = new MainWindow(this, pluginConfiguration);
 			QuestListWindow = new QuestListWindow(this, pluginConfiguration, questService, dalamud.toastGui);
 			currencyWindow = new currencyWindow();
@@ -64,7 +59,7 @@ namespace totalRoleplay
 			WindowSystem.AddWindow(dialogueTriggerWindow);
 			WindowSystem.AddWindow(characterSheetWindow);
 
-			commandHandler = new CommandHandler(this, dalamud.commandManager, questService);
+			commandHandler = new ICommandHandler(this, dalamud.commandHandler, questService, dalamud.commandManager, dalamud.loggingService);
 			pluginInterface.UiBuilder.Draw += DrawUI;
 			pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 		}
@@ -99,38 +94,44 @@ namespace totalRoleplay
 			[PluginService]
 			public DalamudPluginInterface pluginInterface { get; private set; } = null!;
 
-			[PluginService]
-			public CommandManager commandManager { get; private set; } = null!;
+			//[PluginService]
+			public ICommandHandler commandHandler { get; private set; } = null!;
 
 			//        [PluginService]
 			//        public FlyTextGui flyTextGui { get; private set; } = null!;
 
 			[PluginService]
-			public ToastGui toastGui { get; private set; } = null!;
+			public IToastGui toastGui { get; private set; } = null!;
 
 			[PluginService]
-			public ClientState clientState { get; private set; } = null!;
+			public IClientState clientState { get; private set; } = null!;
 
 			[PluginService]
-			public ChatGui chatGui { get; private set; } = null!;
+			public IChatGui chatGui { get; private set; } = null!;
+
+			//[PluginService]
+			//public SigScanner sigScanner { get; private set; } = null!;
 
 			[PluginService]
-			public SigScanner sigScanner { get; private set; } = null!;
+			public IObjectTable objectTable { get; private set; } = null!;
 
 			[PluginService]
-			public ObjectTable objectTable { get; private set; } = null!;
+			public IFramework framework { get; private set; } = null!;
 
 			[PluginService]
-			public Framework framework { get; private set; } = null!;
+			public IGameGui gameGui { get; private set; } = null!;
 
 			[PluginService]
-			public GameGui gameGui { get; private set; } = null!;
+			public IKeyState keyState { get; private set; } = null!;
 
 			[PluginService]
-			public KeyState keyState { get; private set; } = null!;
+			public ITargetManager targetManager { get; private set; } = null!;
 
 			[PluginService]
-			public TargetManager targetManager { get; private set; } = null!;
+			public IPluginLog loggingService { get; private set; } = null!;
+
+			[PluginService]
+			public ICommandManager commandManager { get; private set; } = null!;
 		}
 	}
 }

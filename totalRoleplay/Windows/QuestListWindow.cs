@@ -1,5 +1,6 @@
 using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -13,9 +14,9 @@ public class QuestListWindow : Window, IDisposable
 	private string? selectedQuest;
 	private readonly PluginConfiguration configuration;
 	private readonly QuestService questService;
-	private readonly ToastGui toastGui;
+	private readonly IToastGui toastGui;
 
-	public QuestListWindow(Plugin plugin,  PluginConfiguration configuration, QuestService questService, ToastGui toastGui) : base("TRP - Quests", 0)
+	public QuestListWindow(Plugin plugin, PluginConfiguration configuration, QuestService questService, IToastGui toastGui) : base("TRP - Quests", 0)
 	{
 		this.Size = new Vector2(200, 200);
 		this.SizeCondition = ImGuiCond.Once;
@@ -33,7 +34,7 @@ public class QuestListWindow : Window, IDisposable
 	public override void Draw()
 	{
 		ImGui.Text("Quests");
-		if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, ImGui.GetTextLineHeightWithSpacing() * questService.ActiveQuests.Count * 2 + ImGui.GetStyle().FramePadding.Y)))
+		if (ImGui.BeginListBox("##quests", new Vector2(float.Epsilon, (ImGui.GetTextLineHeightWithSpacing() * questService.ActiveQuests.Count * 2) + ImGui.GetStyle().FramePadding.Y)))
 		{
 			foreach (var activeQuest in questService.ActiveQuests)
 			{

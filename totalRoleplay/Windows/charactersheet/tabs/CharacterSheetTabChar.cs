@@ -5,22 +5,17 @@ using totalRoleplay.Configuration;
 namespace totalRoleplay.Windows.charactersheet.tabs;
 public class CharacterSheetTabChar : CharacterSheetTab
 {
-	public string characterName { get; set; } = "Name!"; // Replace this eventually with the characters actual name. For development this is current a custom string.
-	public string[] characterJobs { get; set; } = { "My First Job", "Second Job!", "Woah! A third!" };
-	public string characterPhysicalBiography { get; set; } = "This character has not set-up a physical biography."; // Is it smart to save a Biography like this? We'll find out...
-	public string characterHistoryBiography { get; set; } = "This character does not have a History.";
-	public int currentJob { get; set; }
-	public string? characterTitle { get; set; } // Should look into getting the title from Honorific.
 	public bool isPrefix { get; set; } = false; // In this context, isPrefix just means whether or not the Title is a prefix. This is false by default.
 	public bool editMode { get; set; } = false;
 	public string _charNameInput = string.Empty;
 	private readonly CharacterConfiguration charConfig;
 	private readonly CharacterSheetWindow charWindow;
-
+	private readonly string[]? jobList;
 	public CharacterSheetTabChar(CharacterConfiguration _charConfig, CharacterSheetWindow _charWindow)
 	{
 		charConfig = _charConfig;
 		charWindow = _charWindow;
+		//jobList = for(var i = 0; i < charConfig.characterJobList.Length; i++) { };
 	}
 	public override void OnClose()
 	{
@@ -47,15 +42,17 @@ public class CharacterSheetTabChar : CharacterSheetTab
 		{
 			ImGui.SetCursorPos(new Vector2(0, 0));
 			ImGui.Text(charNameString);
-			ImGui.Text($"Current Employ: {currentJob}");
+			var _charJob = charConfig.currentJob;
+			ImGui.Text($"Current Employ: {charConfig.characterJobList[_charJob].name}");
 			ImGui.NewLine();
 		}
 		else
 		{
 			ImGui.SetCursorPos(new Vector2(0, 0));
-			var _currentJob = currentJob;
+			var _charJob = charConfig.currentJob;
+
 			ImGui.InputTextWithHint("##charNameEdit", charNameString, ref _charNameInput, 150);
-			ImGui.ListBox("##charJobSelect", ref _currentJob, characterJobs, characterJobs.Length);
+			ImGui.ListBox("##charJobSelect", ref _charJob, jobList, charConfig.characterJobList.Length);
 			ImGui.NewLine();
 		}
 
@@ -67,7 +64,7 @@ public class CharacterSheetTabChar : CharacterSheetTab
 
 	public override void Save()
 	{
-		if (_charNameInput != null && charConfig.characterName != _charNameInput && _charNameInput != "")
+		if (_charNameInput != "" && charConfig.characterName != _charNameInput)
 		{
 			charConfig.characterName = _charNameInput;
 			charConfig.Save();

@@ -5,6 +5,7 @@
   "Description": "Brings roleplay to life (Based upon Total RP 3: Extended)",
   "InternalName": "totalRoleplay",
   "ApplicableVersion": "any",
+  "DalamudApiLevel": 9,
   "Tags": [
     "Roleplay Totality",
     "Roleplay",

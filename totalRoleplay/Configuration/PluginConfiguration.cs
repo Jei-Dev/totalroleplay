@@ -1,5 +1,4 @@
 using Dalamud.Configuration;
-using Dalamud.Logging;
 using Dalamud.Plugin;
 using System;
 
@@ -31,6 +30,6 @@ public class PluginConfiguration : IPluginConfiguration
 	public void Save()
 	{
 		pluginInterface!.SavePluginConfig(this);
-		PluginLog.Debug("Saved Configuration");
+		//IPluginLog.Debug("Saved Configuration");
 	}
 }

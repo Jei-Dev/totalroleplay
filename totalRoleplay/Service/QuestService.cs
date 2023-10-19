@@ -1,14 +1,11 @@
-using Dalamud;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using totalRoleplay.Handlers;
 using totalRoleplay.Model;
 
 namespace totalRoleplay.Service;
@@ -22,14 +19,17 @@ public class QuestService
 	private Dictionary<string, DialogueSequence> Dialogues { get; init; }
 
 	public delegate void OnQuestComplete(string questId);
+#pragma warning disable IDE1006 // Naming Styles
 	public event OnQuestComplete? QuestComplete;
+#pragma warning restore IDE1006 // Naming Styles
 
 	private readonly DialogueService dialogueService;
+	private readonly IPluginLog log;
 
-	public QuestService(DalamudPluginInterface pluginInterface, DialogueService dialogueService)
+	public QuestService(DalamudPluginInterface pluginInterface, DialogueService dialogueService, IPluginLog log)
 	{
 		var questJsonPath = Path.Join(pluginInterface.AssemblyLocation.Directory!.FullName, "quests.json");
-		PluginLog.LogInformation(questJsonPath);
+		//log.Information(questJsonPath);
 		var questJson = File.ReadAllText(questJsonPath);
 		var story = JsonSerializer.Deserialize<Story>(
 			questJson,
@@ -38,6 +38,7 @@ public class QuestService
 		Quests = story.Quests;
 		Dialogues = story.Dialogues;
 		this.dialogueService = dialogueService;
+		this.log = log;
 	}
 
 	private IEnumerable<(string, QuestStateTrigger)> ActiveQuestTriggers =>
@@ -111,7 +112,7 @@ public class QuestService
 		}
 		else
 		{
-			PluginLog.LogWarning("Target has no dialogue.");
+			log.Warning("Target has no dialogue.");
 		}
 	}
 

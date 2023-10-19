@@ -1,8 +1,8 @@
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.ClientState.Objects;
+using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -15,16 +15,16 @@ namespace totalRoleplay.Windows;
 
 public class FakeDialogueWindow : Window, IDisposable
 {
-	private readonly ImGuiScene.TextureWrap backgroundTexture;
+	private readonly IDalamudTextureWrap backgroundTexture;
 	private readonly DialogueService dialogueService;
-	private readonly KeyState keyState;
+	private readonly IKeyState keyState;
 	private readonly PluginConfiguration configuration;
 	public readonly Stopwatch sw = new();
 	private bool prevSpace = false;
-	private readonly ClientState clientState;
-	private readonly TargetManager targetManager;
+	private readonly IClientState clientState;
+	private readonly ITargetManager targetManager;
 
-	public FakeDialogueWindow(DialogueService dialogueService, KeyState keyState, ClientState clientState, TargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
+	public FakeDialogueWindow(DialogueService dialogueService, IKeyState keyState, IClientState clientState, ITargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
 	{
 		this.dialogueService = dialogueService;
 		this.keyState = keyState;

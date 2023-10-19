@@ -1,18 +1,17 @@
-using System;
-using System.Diagnostics;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using System;
 using totalRoleplay.Service;
 
 namespace totalRoleplay.Windows;
 
 public class DialogueTriggerWindow : Window, IDisposable
 {
-	private TargetManager targetManager { get; init; }
+	private ITargetManager targetManager { get; init; }
 	private QuestService questService { get; init; }
 
-	public DialogueTriggerWindow(TargetManager targetManager, QuestService questService) : base("Asdf")
+	public DialogueTriggerWindow(ITargetManager targetManager, QuestService questService) : base("Asdf")
 	{
 		this.IsOpen = true;
 		this.targetManager = targetManager;
