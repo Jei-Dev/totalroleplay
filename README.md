@@ -1,4 +1,4 @@
-# Total Roleplay
+# Chronicle
 
 Roleplay. Your way.
 
