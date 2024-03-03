@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "chroniclePlugin": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

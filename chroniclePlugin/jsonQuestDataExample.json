@@ -1,0 +1,31 @@
+{
+  "Story": {// Story ID
+    "Story Name": "", // Name of the Story from User Input
+    "Story Description": "", // Description of Story from User Input
+
+    "Quest Chain": {
+      "Quest": { // ID of the quest (Generated)
+        "Quest Title": "", // Title of the Quest
+        "Quest Description": "", // Base small description
+        "Quest Reward":  "", // Reward at total quest completion
+        "States": { // States of a Quest
+          "Quest State #1": { // Quest State ID
+            "State Trigger": { // Quest State Triggers
+              {},
+              {}
+            },
+            "Quest State Description": "", // Quest State Description from User Input
+            "Quest State Reward": { /* Array of Rewards */ } // Reward at quest state completion
+          },
+          "Quest State #2": {
+            //Quest Data
+          },
+          "Quest State #3": {
+            // Quest Data
+          }
+        }
+       }
+    }
+  }
+
+}

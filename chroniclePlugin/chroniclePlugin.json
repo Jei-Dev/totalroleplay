@@ -1,0 +1,16 @@
+{
+	"Author": "Clockwerk & Natkr",
+	"Name": "Chronicle",
+	"Punchline": "Roleplay. Your way.",
+	"Description": "Brings roleplay to life (Based upon Total RP 3: Extended)",
+	"InternalName": "chroniclePlugin",
+	"ApplicableVersion": "any",
+	"DalamudApiLevel": 9,
+	"Tags": [
+		"Chronicle",
+		"Roleplay",
+		"RP",
+		"Inventory",
+		"Custom"
+	]
+}
