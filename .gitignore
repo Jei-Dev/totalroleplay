@@ -196,3 +196,6 @@ FakesAssemblies/
 
 #Ignore APK
 *.apk
+
+# Windows 11 Specific
+desktop.ini

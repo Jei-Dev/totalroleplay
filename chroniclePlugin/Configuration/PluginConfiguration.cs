@@ -8,7 +8,7 @@ public class PluginConfiguration : IPluginConfiguration
 {
 	public bool showTextNotify { get; set; } = true;
 
-	private readonly static int VersionLatest = 0;
+	private static readonly int VersionLatest = 0;
 	public int Version { get; set; } = VersionLatest;
 
 	public bool gameInteractionContextMenu { get; set; } = true;

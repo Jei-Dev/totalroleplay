@@ -12,13 +12,13 @@ public class ConfigWindow : Window, IDisposable
 	private readonly PluginConfiguration pluginConfiguration;
 	private readonly IPluginLog log;
 
-	public ConfigWindow(PluginConfiguration pluginConfiguration, IPluginLog log) : base("Chronicle - Configuration")
+	public ConfigWindow(PluginConfiguration _pluginConfiguration, IPluginLog _log) : base("Chronicle - Configuration")
 	{
-		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
-		this.Size = new Vector2(500, 100);
-		this.SizeCondition = ImGuiCond.Always;
-		this.pluginConfiguration = pluginConfiguration;
-		this.log = log;
+		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+		Size = new Vector2(500, 130);
+		SizeCondition = ImGuiCond.Always;
+		pluginConfiguration = _pluginConfiguration;
+		log = _log;
 	}
 	public void Dispose() { }
 	public override void Draw()
@@ -36,8 +36,8 @@ public class ConfigWindow : Window, IDisposable
 			pluginConfiguration.dialogueDrawSpeed = textDrawSpeed;
 		}
 
-		ImGui.SetCursorPos(new Vector2(195, 60));
-		if (ImGui.Button("Save", new Vector2(50, 40)))
+		ImGui.SetCursorPos(new Vector2(450, 90));
+		if (ImGui.Button("Save", new Vector2(40, 30)))
 		{
 			pluginConfiguration.Save();
 			log.Debug("Save button hit");
