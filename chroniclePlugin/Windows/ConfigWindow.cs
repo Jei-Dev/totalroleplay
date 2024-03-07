@@ -1,9 +1,9 @@
+using chroniclePlugin.Configuration;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Numerics;
-using chroniclePlugin.Configuration;
 
 namespace chroniclePlugin.Windows;
 
@@ -12,7 +12,7 @@ public class ConfigWindow : Window, IDisposable
 	private readonly PluginConfiguration pluginConfiguration;
 	private readonly IPluginLog log;
 
-	public ConfigWindow(PluginConfiguration pluginConfiguration, IPluginLog log) : base("Total Roleplay Configuration")
+	public ConfigWindow(PluginConfiguration pluginConfiguration, IPluginLog log) : base("Chronicle - Configuration")
 	{
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 		this.Size = new Vector2(500, 100);
@@ -37,7 +37,7 @@ public class ConfigWindow : Window, IDisposable
 		}
 
 		ImGui.SetCursorPos(new Vector2(195, 60));
-		if (ImGui.Button("Save", new Vector2(50, 50)))
+		if (ImGui.Button("Save", new Vector2(50, 40)))
 		{
 			pluginConfiguration.Save();
 			log.Debug("Save button hit");

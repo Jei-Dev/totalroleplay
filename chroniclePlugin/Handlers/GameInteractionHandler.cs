@@ -1,33 +1,29 @@
+using chroniclePlugin.Configuration;
+using chroniclePlugin.Service;
 using Dalamud.ContextMenu;
 using Dalamud.Plugin.Services;
 using System;
-using chroniclePlugin.Configuration;
-using chroniclePlugin.Service;
 
 namespace chroniclePlugin.Handlers;
+#pragma warning disable CS9113 // Parameter is unread.
 public class GameInteractionHandler : IDisposable
+#pragma warning restore CS9113 // Parameter is unread.
 {
-	private readonly PluginConfiguration pluginConfig;
 	private readonly DalamudContextMenu dalamudContextMenu;
 	private readonly IObjectTable objectTable;
 	private readonly QuestService questService;
 	private readonly IPluginLog log;
-	public GameInteractionHandler(PluginConfiguration _pluginConfig, DalamudContextMenu _dalamudContextMenu, IObjectTable _objectTable, QuestService _questService, IPluginLog log)
+	private readonly PluginConfiguration pluginConfig;
+
+	public GameInteractionHandler(PluginConfiguration pluginConfig, DalamudContextMenu dalamudContextMenu, IObjectTable objectTable, QuestService questService, IPluginLog log)
 	{
-		pluginConfig = _pluginConfig;
-		dalamudContextMenu = _dalamudContextMenu;
-		objectTable = _objectTable;
-		questService = _questService;
+		this.pluginConfig = pluginConfig;
+		this.dalamudContextMenu = dalamudContextMenu;
+		this.objectTable = objectTable;
+		this.questService = questService;
 		this.log = log;
 
-		_dalamudContextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
-	}
-	public void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
-	{
-		if (args.ObjectId == 0xE000000) { log.Verbose("Object ID does not match - Ignoring"); return; }
-		if (!pluginConfig.gameInteractionContextMenu) { log.Verbose("Ignoring Context Menu creation - User does not allow it"); return; }
-
-		AddContextMenu(args);
+		dalamudContextMenu.OnOpenGameObjectContextMenu += OpenGameObjectContextMenu;
 	}
 
 	public void Dispose()
@@ -35,24 +31,29 @@ public class GameInteractionHandler : IDisposable
 		dalamudContextMenu.OnOpenGameObjectContextMenu -= OpenGameObjectContextMenu;
 	}
 
-	public void AddContextMenu(GameObjectContextMenuOpenArgs args)
+	public void OpenGameObjectContextMenu(GameObjectContextMenuOpenArgs args)
 	{
-		var gameObject = objectTable.SearchById(args.ObjectId);
-		if (gameObject == null) return;
+		//if (args.ObjectId == 0xE000000) { log.Verbose("Object ID does not match - Ignoring"); return; }
+		if (!pluginConfig.gameInteractionContextMenu) { log.Verbose("Ignoring Context Menu creation - User does not allow it"); return; }
 
-		if (questService.CanInteractWithTarget(gameObject))
+		var gameObject = objectTable.SearchById(args.ObjectId);
+		if (gameObject == null) { log.Verbose("GameObject: " + gameObject + " does not exist."); return; }
+
+		//if (questService.CanInteractWithTarget(gameObject))
+		if (gameObject)
 		{
-			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Talk to " + gameObject.Name, (a) =>
+			args.AddCustomItem(new GameObjectContextMenuItem(" Talk to " + gameObject.Name, (a) =>
 			{
 				questService.InteractWithTarget(gameObject);
 				// Allow the Item to do something when pressed (Specifically fake dialogue for "Talking")
-			}, false));
+			}));
 
 			var _QuestItem = "Empty Item";
-			args.AddCustomItem(new GameObjectContextMenuItem("[TRP] Give (" + _QuestItem + ")", (a) =>
+			args.AddCustomItem(new GameObjectContextMenuItem(" Give (" + _QuestItem + ")", (a) =>
 			{
 				log.Information("You gave a " + _QuestItem + " to " + gameObject.Name);
 			}, false));
 		}
+		log.Verbose("Opened Context Menu");
 	}
 }

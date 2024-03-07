@@ -1,10 +1,8 @@
+using chroniclePlugin.Configuration;
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
 using ImGuiNET;
 using System;
 using System.Numerics;
-using chroniclePlugin.Configuration;
-using chroniclePlugin.Service;
 
 namespace chroniclePlugin.Windows;
 

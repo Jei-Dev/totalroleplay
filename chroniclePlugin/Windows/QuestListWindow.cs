@@ -1,11 +1,11 @@
+using chroniclePlugin.Configuration;
+using chroniclePlugin.Service;
 using Dalamud.Game.Gui.Toast;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Numerics;
-using chroniclePlugin.Configuration;
-using chroniclePlugin.Service;
 
 namespace chroniclePlugin.Windows;
 
@@ -16,7 +16,7 @@ public class QuestListWindow : Window, IDisposable
 	private readonly QuestService questService;
 	private readonly IToastGui toastGui;
 
-	public QuestListWindow(Plugin plugin, PluginConfiguration configuration, QuestService questService, IToastGui toastGui) : base("TRP - Quests", 0)
+	public QuestListWindow(Plugin plugin, PluginConfiguration configuration, QuestService questService, IToastGui toastGui) : base("Chronicle - Quests", 0)
 	{
 		this.Size = new Vector2(200, 200);
 		this.SizeCondition = ImGuiCond.Once;

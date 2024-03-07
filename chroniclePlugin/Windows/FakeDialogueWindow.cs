@@ -1,3 +1,5 @@
+using chroniclePlugin.Configuration;
+using chroniclePlugin.Service;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
@@ -8,8 +10,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using chroniclePlugin.Configuration;
-using chroniclePlugin.Service;
 
 namespace chroniclePlugin.Windows;
 
@@ -24,10 +24,10 @@ public class FakeDialogueWindow : Window, IDisposable
 	private readonly IClientState clientState;
 	private readonly ITargetManager targetManager;
 
-	public FakeDialogueWindow(DialogueService dialogueService, IKeyState keyState, IClientState clientState, ITargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
+	public FakeDialogueWindow(DialogueService dialogueService, IKeyState _keyState, IClientState clientState, ITargetManager targetManager, PluginConfiguration configuration, DalamudPluginInterface pluginInterface) : base("Fake Dialogue Window")
 	{
 		this.dialogueService = dialogueService;
-		this.keyState = keyState;
+		this.keyState = _keyState;
 		Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBackground;
 
 		var imagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "FFXIVEmptyDialogueBox.png");

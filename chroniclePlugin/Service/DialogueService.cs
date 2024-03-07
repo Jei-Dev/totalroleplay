@@ -1,7 +1,7 @@
+using chroniclePlugin.Model;
 using Dalamud.Plugin.Services;
 using System;
 using System.Linq;
-using chroniclePlugin.Model;
 
 namespace chroniclePlugin.Service;
 
@@ -21,7 +21,7 @@ public class DialogueService
 	public delegate void TriggerQuestAction(QuestStateTriggerAction action);
 	private DialogueSequence? currentDialogueSequence;
 	private TriggerQuestAction? currentQuestActionTriggerHandler;
-	public int currentLineIndex = 0;
+	public int currentLineIndex;
 	public DialogueLine? CurrentDialogueLine => currentDialogueSequence?.Lines?.ElementAtOrDefault(currentLineIndex);
 
 	public void startFakeDialogue(DialogueSequence dialogue, TriggerQuestAction questActionTriggerHandler)
@@ -42,10 +42,11 @@ public class DialogueService
 		{
 			if (trigger.When.Closed)
 			{
-				if (trigger.Then.Quest != null)
+				if (trigger.Then.Quest == null)
 				{
-					currentQuestActionTriggerHandler?.Invoke(trigger.Then.Quest);
+					continue;
 				}
+				currentQuestActionTriggerHandler?.Invoke(trigger.Then.Quest);
 			}
 		}
 		currentLineIndex++;

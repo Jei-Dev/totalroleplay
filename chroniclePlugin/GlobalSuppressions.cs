@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Major Code Smell", "S125:Sections of code should not be commented out", Justification = "While in Alpha, the program may have commented out code.", Scope = "namespaceanddescendants", Target = "~N:chroniclePlugin")]
 [assembly: SuppressMessage("Major Code Smell", "S3881:\"IDisposable\" should be implemented correctly", Justification = "IDisposable is handled by Dalamud and the plugin correctly.", Scope = "namespaceanddescendants", Target = "~N:chroniclePlugin")]
+[assembly: SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "GC.SuppressFinalize is an unnessasery Optimization for our needs.", Scope = "namespaceanddescendants", Target = "~N:chroniclePlugin")]

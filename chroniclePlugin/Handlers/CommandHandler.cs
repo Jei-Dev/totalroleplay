@@ -15,15 +15,16 @@ public class CommandHandler : IDisposable
 	};
 
 	private readonly Commands[] aCommands = {
-		new Commands { CommandName = "trp", HelpMessage = "Opens the Total Roleplay menu."},
-		new Commands { CommandName = "trpq", HelpMessage = null},
-		new Commands { CommandName = "trpqa", HelpMessage = null},
-		new Commands { CommandName = "trpqb", HelpMessage = null},
-		new Commands { CommandName = "trpqt", HelpMessage = null},
-		new Commands { CommandName = "trpc", HelpMessage = "Opens the Currency Window"},
-		new Commands { CommandName = "trpfd", HelpMessage = "Opens the Fake Dialogue Window"},
-		new Commands { CommandName = "trpcs", HelpMessage = "Opens the Character Sheet"},
-		new Commands { CommandName = "trpfi", HelpMessage = "Opens the First Impression Menu"},
+		new() { CommandName = "trp", HelpMessage = "Opens the Total Roleplay menu."},
+		new() { CommandName = "trpq", HelpMessage = null},
+		new() { CommandName = "trpqa", HelpMessage = null},
+		new() { CommandName = "trpqb", HelpMessage = null},
+		new() { CommandName = "trpqt", HelpMessage = null},
+		new() { CommandName = "trpc", HelpMessage = "Opens the Currency Window"},
+		new() { CommandName = "trpfd", HelpMessage = "Opens the Fake Dialogue Window"},
+		new() { CommandName = "trpcs", HelpMessage = "Opens the Character Sheet"},
+		new() { CommandName = "trpfi", HelpMessage = "Opens the First Impression Menu"},
+		new() { CommandName = "cronfakelog", HelpMessage = "Fire a fake log message. 1, Verbose. 2, Debug."},
 	};
 
 	private readonly Plugin plugin;
@@ -97,6 +98,17 @@ public class CommandHandler : IDisposable
 				break;
 			case "/trpfi":
 				plugin.impressionWindow.Toggle();
+				break;
+			case "/cronfakelog":
+				switch (arguments)
+				{
+					case ("1"):
+						log.Verbose("Fake Verbose Log Message");
+						break;
+					case ("2"):
+						log.Debug("Fake Debug Log Message");
+						break;
+				}
 				break;
 		}
 	}

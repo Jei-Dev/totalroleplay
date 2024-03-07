@@ -3,7 +3,7 @@ public abstract class CharacterSheetTab
 {
 	public abstract string Title { get; }
 	public bool IsOpen { get; set; } = false;
-	public virtual bool IsVisible { get; }
+	public virtual bool IsVisible { get; } = true;
 	public virtual void OnOpen()
 	{ }
 	public virtual void OnClose()
