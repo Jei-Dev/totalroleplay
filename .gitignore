@@ -199,3 +199,4 @@ FakesAssemblies/
 
 # Windows 11 Specific
 desktop.ini
+/ChronicleTests/UnitTest1.cs
